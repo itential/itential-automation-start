@@ -11,7 +11,7 @@
   - [Example Usage](#example-usage)
 
 ## Overview
-This Javascript Action triggers an IAP automation from within the Github workflow and returns API trigger output variables.
+A Github action that will trigger Itential automations.
 
 ## Prerequisites  
 An Itential account is required to get credentials needed to configure the Github Actions.
