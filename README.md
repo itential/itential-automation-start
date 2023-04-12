@@ -130,7 +130,7 @@ jobs:
         uses: actions/checkout@v3
       - name: IAP Automation trigger action step
         id: step1
-        uses: itential/test-action@version
+        uses: itential/itential-trigger-automation@version_number
         env:
           #Inputs required to run the action and trigger IAP automation
           IAP_INSTANCE: ${{secrets.IAP_INSTANCE}}
