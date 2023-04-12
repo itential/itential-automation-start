@@ -1,7 +1,9 @@
+# Itential Trigger Automaion Action
+A Github action that will trigger Itential automations.
+
 ## Table of Contents 
-  - [Overview](#overview)
   - [Prerequisites](#prerequisites)
-  - [Supported IAP Versions](#supported-iap-versions)
+  - [Supported Itential Automation Platform Versions](#supported-iap-versions)
   - [Getting Started](#getting-started)
   - [Configurations](#configurations)
     - [Required Input Parameters](#required-input-parameters)
@@ -9,17 +11,13 @@
     - [Output](#output)
   - [Example Usage](#example-usage)
 
-## Overview
-A Github action that will trigger Itential automations.
-
 ## Prerequisites  
 An Itential account is required to get credentials needed to configure the Github Actions.
 In order to utilize this action, you would need to have an active `Itential Automation Platform` (IAP).\
 If you are an existing customer, please contact your Itential account team for additional details.
 For new customers interested in an Itential trial, please click [here](https://www.itential.com/get-started/) to request one.
 
-## Supported Itential Automation Platform(IAP) Versions
-
+## Supported Itential Automation Platform Versions
 * 2022.1
 * 2021.2
 * 2021.1
