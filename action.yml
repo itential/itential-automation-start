@@ -1,37 +1,37 @@
 name: 'itential-trigger-automation'
- description: 'Action to trigger Itential Automation Platform(IAP) automations'
- author: 'Itential'
- branding:
-   icon: 'activity'
-   color: 'blue'
- inputs:
-   IAP_INSTANCE:
-     description: 'Itential Automation Platform instance url'
-     required: true
-   IAP_TOKEN:
-     description: 'Token required to access IAP instance'
-     required: true
-   API_ENDPOINT:
-     description: 'API endpoint name to trigger an automation'
-     required: true
-   API_ENDPOINT_BODY:
-     description: 'The payload required to trigger an automation'
-     required: true
-     default: '{}'
-   TIMEOUT:
-     description: 'Time interval to check automation status'
-     default: '15'
-   NO_OF_ATTEMPTS:
-     description: 'No. of attempts to check automation status'
-     default: '10'
-   JOB_STATUS:
-     description: 'If set to 1 it will wait for the automation status and if set to 0 it will not monitor the automation'
-     default: '1'
+description: 'Action to trigger Itential Automation Platform(IAP) automations'
+author: 'Itential'
+branding:
+  icon: 'activity'
+  color: 'blue'
+inputs:
+  IAP_INSTANCE:
+    description: 'Itential Automation Platform instance url'
+    required: true
+  IAP_TOKEN:
+    description: 'Token required to access IAP instance'
+    required: true
+  API_ENDPOINT:
+    description: 'API endpoint name to trigger an automation'
+    required: true
+  API_ENDPOINT_BODY:
+    description: 'The payload required to trigger an automation'
+    required: true
+    default: '{}'
+  TIMEOUT:
+    description: 'Time interval to check automation status'
+    default: '15'
+  NO_OF_ATTEMPTS:
+    description: 'No. of attempts to check automation status'
+    default: '10'
+  JOB_STATUS:
+    description: 'If set to 1 it will wait for the automation status and if set to 0 it will not monitor the automation'
+    default: '1'
 
- outputs:
-   results: 
-     description: 'Return automation details with output variables'
+outputs:
+  results: 
+    description: 'Return automation details with output variables'
 
- runs:
-   using: 'node16'
-   main: 'dist/index.js'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
