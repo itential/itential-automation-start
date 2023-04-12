@@ -9207,6 +9207,10 @@ async function run() {
                 if (Number(release) <= 2021.1) jobStatus211(res.data._id);
                 else jobStatus221(res.data.data._id);
               }
+              else {
+                if (Number(release) <= 2021.1) setOutput("results", res.data._id);
+                else setOutput("results", res.data.data._id);
+              }
             })
             .catch((err) => {
               setFailed(err.response.data);
