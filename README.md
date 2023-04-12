@@ -2,7 +2,6 @@
   - [Overview](#overview)
   - [Prerequisites](#prerequisites)
   - [Supported IAP Versions](#supported-iap-versions)
-  - [IAP APIs Used in Action](#iap-apis-used-in-action)
   - [Getting Started](#getting-started)
   - [Configurations](#configurations)
     - [Required Input Parameters](#required-input-parameters)
