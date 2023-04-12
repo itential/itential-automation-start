@@ -3,13 +3,15 @@ const { get, post } = require('axios')
 
 async function run() {
   const IAP_TOKEN = getInput("IAP_TOKEN");
-  const IAP_INSTANCE = getInput("IAP_INSTANCE");
   const API_ENDPOINT_BODY = JSON.parse(getInput("API_ENDPOINT_BODY"));
   const TIMEOUT = getInput("TIME_INTERVAL");
   const NO_OF_ATTEMPTS = getInput("NO_OF_ATTEMPTS");
   const JOB_STATUS = getInput("JOB_STATUS");
+  if (IAP_INSTANCE.endsWith('/'))
+    IAP_INSTANCE = IAP_INSTANCE.substring(0, IAP_INSTANCE.length - 1);
   let API_ENDPOINT = getInput("API_ENDPOINT");
-  if (API_ENDPOINT.endsWith('/')) API_ENDPOINT = API_ENDPOINT.substring(0, API_ENDPOINT.length - 1);
+  if (API_ENDPOINT.startsWith('/'))
+    API_ENDPOINT = API_ENDPOINT.substring(1);
   let count = 0;
 
   try {
