@@ -9111,6 +9111,7 @@ async function run() {
   const TIMEOUT = getInput("TIME_INTERVAL");
   const NO_OF_ATTEMPTS = getInput("NO_OF_ATTEMPTS");
   const JOB_STATUS = getInput("JOB_STATUS");
+  let IAP_INSTANCE = getInput("IAP_INSTANCE");
   if (IAP_INSTANCE.endsWith('/'))
     IAP_INSTANCE = IAP_INSTANCE.substring(0, IAP_INSTANCE.length - 1);
   let API_ENDPOINT = getInput("API_ENDPOINT");
