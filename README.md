@@ -19,29 +19,11 @@ In order to utilize this action, you would need to have an active `Itential Auto
 If you are an existing customer, please contact your Itential account team for additional details.
 For new customers interested in an Itential trial, please click [here](https://www.itential.com/get-started/) to request one.
 
+## Supported Itential Automation Platform(IAP) Versions
 
-## Supported IAP Versions
-
-* IAP 2022.1
-
-* IAP 2021.2
-
-* IAP 2021.1
-
-
-## IAP APIs Used in Action
-
-GET /health/server
-
-POST /operations-manager/triggers/endpoint/:routeName
-
-- ### IAP Release <= 2021.1
-        GET /workflow_engine/job/:job_id/details
-
-        GET /workflow_engine/job/:job_id/output
-
-- ### IAP Release > 2021.1
-        GET /operations-manager/jobs/:id
+* 2022.1
+* 2021.2
+* 2021.1
 
 ## Getting Started
 1. Search for the Action on Github Marketplace.
