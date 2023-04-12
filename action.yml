@@ -1,37 +1,37 @@
 name: 'itential-trigger-automation'
-description: 'Action to trigger Itential Automation Platform(IAP) automations'
+description: 'A JavaScript action to run IAP automation using API trigger'
 author: 'Itential'
 branding:
   icon: 'activity'
   color: 'blue'
 inputs:
   IAP_INSTANCE:
-    description: 'Itential Automation Platform instance url'
+    description: 'IAP Instance to run workflow'
     required: true
   IAP_TOKEN:
-    description: 'Token required to access IAP instance'
+    description: 'IAP Instance token to authorize'
     required: true
   API_ENDPOINT:
     description: 'API endpoint name to trigger an automation'
     required: true
   API_ENDPOINT_BODY:
-    description: 'The payload required to trigger an automation'
+    description: 'the POST body used to create the workflow input'
+    default: '{}'
     required: true
   TIMEOUT:
-    description: 'Time interval to check automation status'
+    description: 'Time interval to check job status'
     default: '15'
   NO_OF_ATTEMPTS:
-    description: 'No. of attempts to check automation status'
+    description: 'No of attempts to check job status'
     default: '10'
   JOB_STATUS:
-    description: 'If set to 1 it will wait for the automation status and if set to 0 it will not monitor the automation'
+    description: 'Display status of the job with the output'
     default: '1'
 
 outputs:
   results: 
-    description: 'Return automation details with output variables'
+    description: 'API Trigger output variables'
 
 runs:
   using: 'node16'
   main: 'dist/index.js'
-
