@@ -2,37 +2,37 @@ const { getInput, setOutput, setFailed } = require("@actions/core");
 const { get, post } = require('axios')
 
 async function run() {
-  const IAP_TOKEN = getInput("IAP_TOKEN");
-  const API_ENDPOINT_BODY = JSON.parse(getInput("API_ENDPOINT_BODY"));
-  const TIMEOUT = getInput("TIME_INTERVAL");
-  const NO_OF_ATTEMPTS = getInput("NO_OF_ATTEMPTS");
-  const JOB_STATUS = getInput("JOB_STATUS");
-  let IAP_INSTANCE = getInput("IAP_INSTANCE");
-  if (IAP_INSTANCE.endsWith('/'))
-    IAP_INSTANCE = IAP_INSTANCE.substring(0, IAP_INSTANCE.length - 1);
-  let API_ENDPOINT = getInput("API_ENDPOINT");
-  if (API_ENDPOINT.startsWith('/'))
-    API_ENDPOINT = API_ENDPOINT.substring(1);
+  const iap_token = getInput("iap_token");
+  const api_endpoint_body = JSON.parse(getInput("api_endpoint_body"));
+  const timeout = getInput("time_interval");
+  const no_of_attempts = getInput("no_of_attempts");
+  const automation_status = getInput("automation_status");
+  let iap_instance = getInput("iap_instance");
+  if (iap_instance.endsWith('/'))
+    iap_instance = iap_instance.substring(0, iap_instance.length - 1);
+  let api_endpoint = getInput("api_endpoint");
+  if (api_endpoint.startsWith('/'))
+    api_endpoint = api_endpoint.substring(1);
   let count = 0;
 
   try {
-    //check the status of the job and return the output (IAP release <= 2021.1)
-    const jobStatus211 = (job_id) => {
+    //check the status of the automation and return the output (IAP release <= 2021.1)
+    const automationStatus211 = (automation_id) => {
       get(
-        `${IAP_INSTANCE}/workflow_engine/job/${job_id}/details?token=` +
-        IAP_TOKEN
+        `${iap_instance}/workflow_engine/job/${automation_id}/details?token=` +
+        iap_token
       )
         .then((res) => {
-          console.log("Job Status: ", res.data.status);
-          if (res.data.status === "running" && count < NO_OF_ATTEMPTS) {
+          console.log("Automation Status: ", res.data.status);
+          if (res.data.status === "running" && count < no_of_attempts) {
             setTimeout(() => {
               count += 1;
-              jobStatus211(job_id);
-            }, TIMEOUT * 1000);
+              automationStatus211(automation_id);
+            }, timeout * 1000);
           } else if (res.data.status === "complete") {
             get(
-              `${IAP_INSTANCE}/workflow_engine/job/${job_id}/output?token=` +
-              IAP_TOKEN
+              `${iap_instance}/workflow_engine/job/${automation_id}/output?token=` +
+              iap_token
             )
               .then((res) => {
                 setOutput("results", res.data.variables);
@@ -41,12 +41,12 @@ async function run() {
                 setFailed(err.response.data);
               });
           } else if (res.data.status === "canceled") {
-            setFailed("Job Canceled");
+            setFailed("Automation Canceled");
           } else if (res.data.status === "error") {
             setFailed(res.data.error);
           } else {
             setFailed(
-              "Job Timed out based upon user defined TIMEOUT and NO_OF_ATTEMPTS"
+              "Automation Timed out based upon user defined timeout and no_of_attempts"
             );
           }
         })
@@ -55,27 +55,27 @@ async function run() {
         });
     };
 
-    //check the status of the job and return the output (IAP release > 2021.1)
-    const jobStatus221 = (job_id) => {
+    //check the status of the automation and return the output (IAP release > 2021.1)
+    const automationStatus221 = (automation_id) => {
       get(
-        `${IAP_INSTANCE}/operations-manager/jobs/${job_id}?token=` + IAP_TOKEN
+        `${iap_instance}/operations-manager/jobs/${automation_id}?token=` + iap_token
       )
         .then((res) => {
-          console.log("Job Status: ", res.data.data.status);
-          if (res.data.data.status === "running" && count < NO_OF_ATTEMPTS) {
+          console.log("Automation Status: ", res.data.data.status);
+          if (res.data.data.status === "running" && count < no_of_attempts) {
             setTimeout(() => {
               count += 1;
-              jobStatus221(job_id);
-            }, TIMEOUT * 1000);
+              automationStatus221(automation_id);
+            }, timeout * 1000);
           } else if (res.data.data.status === "complete") {
             setOutput("results", res.data.data.variables);
           } else if (res.data.data.status === "canceled") {
-            setFailed("Job Canceled");
+            setFailed("Automation Canceled");
           } else if (res.data.data.status === "error") {
             setFailed(res.data.data.error);
           } else {
             setFailed(
-              "Job Timed out based upon user defined TIMEOUT and NO_OF_ATTEMPTS"
+              "Automation Timed out based upon user defined timeout and no_of_attempts"
             );
           }
         })
@@ -84,9 +84,9 @@ async function run() {
         });
     };
 
-    //start the job on GitHub event
-    const startJob = () => {
-      get(`${IAP_INSTANCE}/health/server?token=` + IAP_TOKEN)
+    //start the automation on GitHub event
+    const startAutomation = () => {
+      get(`${iap_instance}/health/server?token=` + iap_token)
         .then((res) => {
           const release = res.data.release.substring(
             0,
@@ -94,14 +94,14 @@ async function run() {
           );
 
           post(
-            `${IAP_INSTANCE}/operations-manager/triggers/endpoint/${API_ENDPOINT}?token=` +
-            IAP_TOKEN,
-            API_ENDPOINT_BODY
+            `${iap_instance}/operations-manager/triggers/endpoint/${api_endpoint}?token=` +
+            iap_token,
+            api_endpoint_body
           )
             .then((res) => {
-              if (Boolean(Number(JOB_STATUS)) === true) {
-                if (Number(release) <= 2021.1) jobStatus211(res.data._id);
-                else jobStatus221(res.data.data._id);
+              if (Boolean(Number(automation_status)) === true) {
+                if (Number(release) <= 2021.1) automationStatus211(res.data._id);
+                else automationStatus221(res.data.data._id);
               }
               else {
                 if (Number(release) <= 2021.1) setOutput("results", res.data._id);
@@ -117,7 +117,7 @@ async function run() {
         });
     };
 
-    startJob();
+    startAutomation();
   } catch (e) {
     setFailed(e);
   }

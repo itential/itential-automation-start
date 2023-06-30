@@ -37,8 +37,8 @@ Note: Users may manually enter required input parameters or use Github Secrets i
 2. Select the secrets and variables tab under security options 
 3. Click the "new repository secret"option on the top right of the screen 
 4. Enter the required fields 
-For YOUR_SECRET_NAME enter a required input. 
-For SECRET enter your desired variable. 
+For your_secret_name enter a required input. 
+For secret enter your desired variable. 
 6. Click "Add Secret"
 
 _For more information about Github Actions variables, see [variables](https://docs.github.com/en/actions/learn-github-actions/variables)_
@@ -54,21 +54,21 @@ The following table defines the four required parameters to run an IAP automatio
 
 | Parameter | Description |
 | --- | --- |
-| IAP_INSTANCE | URL to the IAP Instance |
-| IAP_TOKEN | To authenticate api requests to the instance |
-| API_ENDPOINT | API endpoint name to trigger an automation |
-| API\_ENDPOINT\_BODY | The POST body used to create the workflow input |
+| iap_instance | URL to the IAP Instance |
+| iap_token | To authenticate api requests to the instance |
+| api_endpoint | API endpoint name to trigger an automation |
+| api\_endpoint\_body | The POST body used to create the workflow input |
 
 ### Optional Input Parameters
 The following table defines three parameters considered optional. 
 
-**Note:** By default, JOB_STATUS is set to 1 and it will return the job output . If you do not want  the output returned and just want to trigger the automation, set JOB_STATUS to 0.
+**Note:** By default, job_status is set to 1 and it will return the job output . If you do not want  the output returned and just want to trigger the automation, set job_status to 0.
 
 | Parameter | Description | Default Value |
 | --- | --- | --- |
-| JOB_STATUS | If user want to check the status of the job. | 1   |
-| TIME_INTERVAL | Time interval to check job status | 15 seconds |
-| NO\_OF\_ATTEMPTS | No of attempts to check job status | 10  |
+| job_status | If user want to check the status of the job. | 1   |
+| time_interval | Time interval to check job status | 15 seconds |
+| no\_of\_attempts | No of attempts to check job status | 10  |
 
 ### Output
 
@@ -112,14 +112,14 @@ jobs:
         uses: itential/itential-trigger-automation@version_number
         env:
           #Inputs required to run the action and trigger IAP automation
-          IAP_INSTANCE: ${{secrets.IAP_INSTANCE}}
-          IAP_TOKEN: ${{secrets.IAP_TOKEN}}
-          API_ENDPOINT: ${{secrets.API_ENDPOINT}}
-          API_ENDPOINT_BODY: ${{secrets.API_ENDPOINT_BODY}}
+          iap_instance: ${{secrets.iap_instance}}
+          iap_token: ${{secrets.iap_token}}
+          api_endpoint: ${{secrets.api_endpoint}}
+          api_endpoint_body: ${{secrets.api_endpoint_body}}
           #Additional inputs to wait for job completion and get output results.
-          JOB_STATUS: 1
-          NO_OF_ATTEMPTS: 10
-          TIME_INTERVAL: 15
+          job_status: 1
+          no_of_attempts: 10
+          time_interval: 15
       - name: Get output
         run: echo "${{steps.step1.outputs.results}}"
 ```
