@@ -31,14 +31,14 @@ jobs:
         id: step1
         uses: ./
         with:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          IAP_TOKEN: ${{secrets.IAP_TOKEN}}
-          IAP_INSTANCE: ${{secrets.IAP_INSTANCE}}
-          TIMEOUT: 15
-          NO_OF_ATTEMPTS: 10
-          API_ENDPOINT: ${{secrets.API_ENDPOINT}}
-          API_ENDPOINT_BODY: ${{secrets.API_ENDPOINT_BODY}}
-          JOB_STATUS: 1
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          iap_token: ${{secrets.IAP_TOKEN}}
+          iap_instance: ${{secrets.IAP_INSTANCE}}
+          timeout: 15
+          no_of_attempts: 10
+          api_endpoint: ${{secrets.API_ENDPOINT}}
+          api_endpoint_body: ${{secrets.API_ENDPOINT_BODY}}
+          job_status: 1
       - name: Get output
         run: echo "${{steps.step1.outputs.results}}"
   job2:
