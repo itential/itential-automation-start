@@ -35,7 +35,7 @@ jobs:
           iap_token: ${{secrets.IAP_TOKEN}}
           iap_instance: ${{secrets.IAP_INSTANCE}}
           timeout: 60
-          no_of_attempts: 100
+          no_of_attempts: 200
           api_endpoint: ${{secrets.API_ENDPOINT}}
           #api_endpoint_body: ${{secrets.API_ENDPOINT_BODY}}
           job_status: 1
