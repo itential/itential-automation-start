@@ -38,7 +38,7 @@ jobs:
           no_of_attempts: 1
           api_endpoint: ${{secrets.API_ENDPOINT}}
           #api_endpoint_body: ${{secrets.API_ENDPOINT_BODY}}
-          job_status: 1
+          automation_status: 1
       - name: Get output
         run: echo "${{steps.step1.outputs.results}}"
   job2:
