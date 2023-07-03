@@ -34,7 +34,7 @@ jobs:
           #github_token: ${{secrets.GITHUB_TOKEN}}
           iap_token: ${{secrets.IAP_TOKEN}}
           iap_instance: ${{secrets.IAP_INSTANCE}}
-          timeout: 15
+          timeout: 60
           no_of_attempts: 10
           api_endpoint: ${{secrets.API_ENDPOINT}}
           #api_endpoint_body: ${{secrets.API_ENDPOINT_BODY}}
