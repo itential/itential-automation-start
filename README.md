@@ -37,8 +37,8 @@ Note: Users may manually enter required input parameters or use Github Secrets i
 2. Select the secrets and variables tab under security options 
 3. Click the "new repository secret"option on the top right of the screen 
 4. Enter the required fields 
-For your_secret_name enter a required input. 
-For secret enter your desired variable. 
+For YOUR_SECRET_NAME enter a required input. 
+For SECRET enter your desired variable. 
 6. Click "Add Secret"
 
 _For more information about Github Actions variables, see [variables](https://docs.github.com/en/actions/learn-github-actions/variables)_
