@@ -1,0 +1,26 @@
+{
+  "name": "itential-trigger-automation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "ncc build src/action.js -o dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itential/itential-trigger-automation.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/itential/itential-trigger-automation/issues"
+  },
+  "homepage": "https://github.com/itential/itential-trigger-automation#readme",
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1",
+    "@vercel/ncc": "^0.36.0",
+    "axios": "^1.2.1"
+  }
+}
