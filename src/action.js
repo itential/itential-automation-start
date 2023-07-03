@@ -35,7 +35,7 @@ async function run() {
               iap_token
             )
               .then((res) => {
-                setOutput("results", res.data.variables);
+                setOutput("results", res.data.variables); 
               })
               .catch((err) => {
                 setFailed(err.response.data);
@@ -68,7 +68,7 @@ async function run() {
               automationStatus221(automation_id);
             }, timeout * 1000);
           } else if (res.data.data.status === "complete") {
-            setOutput("results", res.data.data.variables);
+            setOutput("results", "hello"+ res.data.data.variables);
           } else if (res.data.data.status === "canceled") {
             setFailed("Automation Canceled");
           } else if (res.data.data.status === "error") {
