@@ -11,7 +11,7 @@ inputs:
   iap_token:
     description: 'Token required to access IAP instance'
     required: true
- api_endpoint:
+  api_endpoint:
     description: 'API endpoint name to trigger an automation'
     required: true
   api_endpoint_body:
