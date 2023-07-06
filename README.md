@@ -66,7 +66,7 @@ The following table defines three parameters considered optional.
 
 | Parameter | Description | Default Value |
 | --- | --- | --- |
-| job_status | If user want to check the status of the job. | 1   |
+| automation_status | If user want to check the status of the job. | 1   |
 | time_interval | Time interval to check job status | 15 seconds |
 | no\_of\_attempts | No of attempts to check job status | 10  |
 
@@ -112,12 +112,12 @@ jobs:
         uses: itential/itential-trigger-automation@version_number
         env:
           #Inputs required to run the action and trigger IAP automation
-          iap_instance: ${{secrets.iap_instance}}
-          iap_token: ${{secrets.iap_token}}
-          api_endpoint: ${{secrets.api_endpoint}}
-          api_endpoint_body: ${{secrets.api_endpoint_body}}
+          iap_instance: ${{secrets.IAP_INSTANCE}}
+          iap_token: ${{secrets.IAP_TOKEN}}
+          api_endpoint: ${{secrets.API_ENDPOINT}}
+          api_endpoint_body: ${{secrets.API_ENDPOINT_BODY}}
           #Additional inputs to wait for job completion and get output results.
-          job_status: 1
+          automation_status: 1
           no_of_attempts: 10
           time_interval: 15
       - name: Get output
