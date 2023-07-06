@@ -62,13 +62,13 @@ The following table defines the four required parameters to run an IAP automatio
 ### Optional Input Parameters
 The following table defines three parameters considered optional. 
 
-**Note:** By default, job_status is set to 1 and it will return the job output . If you do not want  the output returned and just want to trigger the automation, set job_status to 0.
+**Note:** By default, automation_status is set to 1 and it will return the automation output . If you do not want  the output returned and just want to trigger the automation, set automation_status to 0.
 
 | Parameter | Description | Default Value |
 | --- | --- | --- |
-| automation_status | If user want to check the status of the job. | 1   |
-| time_interval | Time interval to check job status | 15 seconds |
-| no\_of\_attempts | No of attempts to check job status | 10  |
+| automation_status | If user want to check the status of the automation. | 1   |
+| time_interval | Time interval to check automation status | 15 seconds |
+| no\_of\_attempts | No of attempts to check automation status | 10  |
 
 ### Output
 
@@ -110,13 +110,13 @@ jobs:
       - name: IAP Automation trigger action step
         id: step1
         uses: itential/itential-trigger-automation@version_number
-        env:
+        with:
           #Inputs required to run the action and trigger IAP automation
           iap_instance: ${{secrets.IAP_INSTANCE}}
           iap_token: ${{secrets.IAP_TOKEN}}
           api_endpoint: ${{secrets.API_ENDPOINT}}
           api_endpoint_body: ${{secrets.API_ENDPOINT_BODY}}
-          #Additional inputs to wait for job completion and get output results.
+          #Additional inputs to wait for automation completion and get output results.
           automation_status: 1
           no_of_attempts: 10
           time_interval: 15
