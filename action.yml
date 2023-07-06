@@ -18,7 +18,7 @@ inputs:
     description: 'The payload required to trigger an automation'
     required: true
     default: '{}'
-  timeout:
+  time_interval:
     description: 'Time interval to check automation status'
     default: '15'
   no_of_attempts:
