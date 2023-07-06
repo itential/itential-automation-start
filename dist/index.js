@@ -9399,7 +9399,7 @@ const { get, post } = __nccwpck_require__(8757)
 async function run() {
   const iap_token = getInput("iap_token");
   const api_endpoint_body = JSON.parse(getInput("api_endpoint_body"));
-  const timeout = getInput("time_interval");
+  const time_interval = getInput("time_interval");
   const no_of_attempts = getInput("no_of_attempts");
   const automation_status = getInput("automation_status");
   let iap_instance = getInput("iap_instance");
@@ -9423,7 +9423,7 @@ async function run() {
             setTimeout(() => {
               count += 1;
               automationStatus211(automation_id);
-            }, timeout * 1000);
+            }, time_interval * 1000);
           } else if (res.data.status === "complete") {
             get(
               `${iap_instance}/workflow_engine/job/${automation_id}/output?token=` +
@@ -9441,7 +9441,7 @@ async function run() {
             setFailed(res.data.error);
           } else {
             setFailed(
-              "Automation Timed out based upon user defined timeout and no_of_attempts"
+              "Automation Timed out based upon user defined time_interval and no_of_attempts"
             );
           }
         })
@@ -9461,7 +9461,7 @@ async function run() {
             setTimeout(() => {
               count += 1;
               automationStatus221(automation_id);
-            }, timeout * 1000);
+            }, time_interval * 1000);
           } else if (res.data.data.status === "complete") {
             setOutput("results", res.data.data.variables);
           } else if (res.data.data.status === "canceled") {
@@ -9470,7 +9470,7 @@ async function run() {
             setFailed(res.data.data.error);
           } else {
             setFailed(
-              "Automation Timed out based upon user defined timeout and no_of_attempts"
+              "Automation Timed out based upon user defined time_interval and no_of_attempts"
             );
           }
         })
