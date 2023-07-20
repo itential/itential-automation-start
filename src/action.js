@@ -87,6 +87,7 @@ async function run() {
 
     //start the automation on GitHub event
     const startAutomation = () => {
+      console.log(api_endpoint_body);
       get(`${iap_instance}/health/server?token=` + iap_token)
         .then((res) => {
           const release = res.data.release.substring(
