@@ -1,6 +1,4 @@
-//const { getInput, setOutput, setFailed } = require("@actions/core");
 import { getInput, setOutput, setFailed } from "@actions/core";
-//const { get, post } = require('axios')
 import axios from 'axios'
 import { ItentialSDK } from "ea-utils/sdk.js";
 
@@ -8,19 +6,19 @@ import { ItentialSDK } from "ea-utils/sdk.js";
 async function run() {
 
    //test variables
-  /*const iap_token = 'MzRhNTFhMDczM2Q5OTVmNzk5ZGVlYTBjZGQxN2MyODY=';
-  const api_endpoint_body = {};
+  /*const iap_token = 'YjcwMTMwNmI1MDFiMzAzNTJjOWFiNzg2YTYxNjJkYTU=';
+  const api_endpoint_body = {"time": "34", "endtime": "56"};
   const time_interval = 15;
   const no_of_attempts = 10;
   const automation_status = 1;
   let iap_instance = 'https://itential-se-poc-stg-221.trial.itential.io/';
   if (iap_instance.endsWith('/'))
     iap_instance = iap_instance.substring(0, iap_instance.length - 1);
-  let api_endpoint = 'Scott';
+  let api_endpoint = 'test_route';
   if (api_endpoint.startsWith('/'))
     api_endpoint = api_endpoint.substring(1);
-  */
- 
+    */
+  
   const iap_token = getInput("iap_token");
   const api_endpoint_body = JSON.parse(getInput("api_endpoint_body"));
   const time_interval = getInput("time_interval");
@@ -94,15 +92,15 @@ async function run() {
     //check the status of the automation and return the output (IAP release > 2021.1)
     const automationStatus221 = (automation_id) => {
 
-      console.log("sdk integrated");
+      console.log("updated sdk integrated");
 
-      opsManager.getJobResult(automation_id, (res,err) => {
+      opsManager.getAutomationResult(automation_id, (res,err) => {
         if (err){
           if (typeof err === "string") {
             setFailed(err);
-          } else {
+          } else if(typeof err.response === "object") {
             setFailed(err.response.data);
-          }
+          } else setFailed("Failed while getting automation result: Please check the instance configuration and credentials");
         } else {
           console.log("Automation Status: ", res.status);
           if (res.status === "running" && count < no_of_attempts) {
@@ -135,7 +133,11 @@ async function run() {
         console.log("checked the health");
 
         if(err){
-          setFailed(err.response.data);
+          if(typeof err === "string"){
+            setFailed(err);
+           } else if(typeof err.response === "object") {
+             setFailed(err.response.data);
+           } else setFailed("Failed while checking server health: Please check the instance configuration and credentials");
         } else {
 
           const release = res.release.substring(
@@ -143,12 +145,16 @@ async function run() {
             res.release.lastIndexOf(".")
           );
 
-          opsManager.startJobEndpoint(api_endpoint, api_endpoint_body, (res, err)=> {
+          opsManager.startAutomationEndpoint(api_endpoint, api_endpoint_body, (res, err)=> {
 
             console.log("triggered endpoint using sdk");
 
             if(err){
-              setFailed(err.response.data);
+              if(typeof err === "string"){
+                setFailed(err);
+              } else if(typeof err.response === "object") {
+                setFailed(err.response.data);
+              } else setFailed("Failed while triggering automation: Please check the instance configuration and credentials");
             }else {
               if (Boolean(Number(automation_status)) === true) {
                 if (Number(release) <= 2021.1) automationStatus211(res._id);
