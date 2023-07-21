@@ -17,7 +17,7 @@ async function run() {
   let api_endpoint = 'test_route';
   if (api_endpoint.startsWith('/'))
     api_endpoint = api_endpoint.substring(1);
-    */
+  */
   
   const iap_token = getInput("iap_token");
   const api_endpoint_body = JSON.parse(getInput("api_endpoint_body"));
