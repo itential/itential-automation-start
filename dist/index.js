@@ -10620,7 +10620,7 @@ const external_querystring_namespaceObject = __WEBPACK_EXTERNAL_createRequire(im
 
 class Authentication {
   constructor(instanceList) {
-    this.default_expiry_duration = 2; // in minutes, set it to 60 minutes
+    this.default_expiry_duration = 60; // in minutes, set it to 60 minutes
     this.users = this.validateList(instanceList);
   }
 
@@ -10666,10 +10666,10 @@ class Authentication {
       };
       const res = await lib_axios.post(url, data);
       this.users[indx].token = res.data;
-      // putting an expiry time of 1 minute to test
       const timeNow = new Date();
       console.log('time now', timeNow);
-      this.users[indx].expires_in = timeNow.setMinutes(timeNow.getMinutes() + 1);
+      //setting the efault expiry duration since the responsed does not provide an appropriate expiry duration
+      this.users[indx].expires_in = timeNow.setMinutes(timeNow.getMinutes() + this.default_expiry_duration);
       console.log('expiry set to ', timeNow);
       console.log('the new token', this.users[indx].expires_in);
       return callback(this.users[indx].token);
@@ -10691,9 +10691,9 @@ class Authentication {
       };
       const res = await lib_axios.post(url, data);
       this.users[indx].token = res.data; // update the token in the list
-      // putting an expiry time of 2 minute
       const timeNow = new Date();
       console.log('time now', timeNow);
+      //setting the efault expiry duration since the responsed does not provide an appropriate expiry duration
       this.users[indx].expires_in = timeNow.setMinutes(timeNow.getMinutes() + this.default_expiry_duration);
       console.log('expiry set to ', timeNow);
       console.log('the renewed token ', this.users[indx].token);
@@ -10721,12 +10721,11 @@ class Authentication {
       };
       const res = await lib_axios.post(url, data, config);
       this.users[indx].token = res.data.access_token;
-      // actual code ..
-      // const timeNow = new Date();
-      // this.users[indx].expires_in = timeNow.setSeconds(timeNow.getSeconds() + res.data.expires_in);
-      // ** test code ** putting an expiry time of 1 minute to test
       const timeNow = new Date();
-      this.users[indx].expires_in = timeNow.setMinutes(timeNow.getMinutes() + 1);
+      this.users[indx].expires_in = timeNow.setSeconds(timeNow.getSeconds() + res.data.expires_in);
+      /*** test code ** putting an expiry time of 1 minute to test
+      const timeNow = new Date();
+      this.users[indx].expires_in = timeNow.setMinutes(timeNow.getMinutes() + 1);*/
       return callback(this.users[indx].token);
     } catch (err) {
       console.log('got error');
@@ -10751,7 +10750,7 @@ class Authentication {
         }
       };
       const res = await lib_axios.post(url, data, config);
-      this.users[indx].token = res.data.access_token; // update the token in the list,//** will have to check res and modify
+      this.users[indx].token = res.data.access_token; // update the token in the list of users
       const timeNow = new Date();
       timeNow.setSeconds(timeNow.getSeconds() + res.data.expires_in);
       this.users[indx].expires_in = timeNow;
@@ -10774,6 +10773,7 @@ class Authentication {
         if (valid === true) {
           return callback(this.users[indx].token); // token exists
         }
+
         // else renew token
         // if OAuth user
         if (this.users[indx].authType.oAuth) {
@@ -10855,10 +10855,12 @@ class Authentication {
     } else {
       errorMessage.push('For authentication , manadatory properties \'token\' or \'client_id\' or \'username\' is missing');
     }
+
     if (errorMessage.length > 0) {
       // console.log(errorMessage);
       user.errorMessage = errorMessage;
     } else {
+      //a valid user will have the the authType property now
       user.authType = authType;
       if(user.errorMessage){
         delete user.errorMessage;
@@ -10880,10 +10882,11 @@ class Authentication {
         user.validity = valid; 
         // console.log(valid);
         if (valid) {
-
+          //if valid user add the additional properties as per the auth type
           if (user.hostname.endsWith('/')){
             user.hostname = user.hostname.substring(0, user.hostname.length - 1);
           }
+
           if (user.authType.oAuth) {
             user.authId = `${user.hostname}_${user.client_id}`;
             user.token = '';
@@ -10903,11 +10906,12 @@ class Authentication {
         }
         usersInitial.push(user);
       }else {
+        //else push as it is , with validity property as false
         usersInitial.push(checkUser);
       }
 
     });
-
+    
     return usersInitial;
   }
 }
@@ -11029,35 +11033,35 @@ class OperationsManagerAPI {
   }
 
   /**
-  * Returns the job metrics object given a specific job id.
+  * Returns the automation metrics object given a specific automation id.
   *
-  * @param {String} id - the job id which to get metrics
+  * @param {String} id - the automation id which to get metrics
   * @param {function callback(metrics, fail)} - a function which returns a metrics object or a failure message
   * @returns - metrics object or failure message
   */
-  getJobMetrics(id, callback) {
+  getAutomationMetrics(id, callback) {
     if (id === null) {
-      return callback(null, 'Job ID is Null');
+      return callback(null, 'Automation ID is Null');
     }
-    this.getJobResult(id, (job, fail) => {
+    this.getAutomationResult(id, (automation, fail) => {
       if (fail) {
         return callback(null, fail);
       }
-      if (job.status === 'complete' || job.status === 'canceled' || job.status === 'error') {
-        return callback(job.metrics, null);
+      if (automation.status === 'complete' || automation.status === 'canceled' || automation.status === 'error') {
+        return callback(automation.metrics, null);
       }
-      return callback(null, `Job is not finished! Job State: ${job.status}`);
+      return callback(null, `Automation is not finished! Automation State: ${automation.status}`);
     });
   }
 
   /**
-   * Returns a job object
+   * Returns a automation object
    *
-   * @param {String} id - the job id which to get the result of
-   * @param {function callback(job, fail)} - A function that returns the successfull job or a failure message.
-   * @returns - job object or failure message
+   * @param {String} id - the automation id which to get the result of
+   * @param {function callback(automation, fail)} - A function that returns the successfull automation or a failure message.
+   * @returns - automation object or failure message
    */
-  async getJobResult(id, callback) {
+  async getAutomationResult(id, callback) {
     try {
       let token = '';
       await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
@@ -11067,7 +11071,7 @@ class OperationsManagerAPI {
         token = theToken;
       });
       if (id === null) {
-        return callback(null, 'Job ID is Null');
+        return callback(null, 'Automation ID is Null');
       }
       const url = `${this.baseURL}/operations-manager/jobs/${id}?token=${token}`;
       const res = await lib_axios.get(url);
@@ -11078,32 +11082,32 @@ class OperationsManagerAPI {
   }
 
   /**
-   * Returns the job status given a specific job id.
+   * Returns the automation status given a specific automation id.
    *
-   * @param {String} id - the id which to get the job status of
-   * @param {function callback(status, fail)} - A function that returns a job status or a fail message
-   * @returns - job status or failure message
+   * @param {String} id - the id which to get the automation status of
+   * @param {function callback(status, fail)} - A function that returns a automation status or a fail message
+   * @returns - automation status or failure message
    */
-  getJobStatus(id, callback) {
+  getAutomationStatus(id, callback) {
     if (id === null) {
-      return callback(null, 'Job ID is null');
+      return callback(null, 'Automation ID is null');
     }
-    this.getJobResult(id, (job, fail) => {
+    this.getAutomationResult(id, (automation, fail) => {
       if (fail) {
         return callback(null, fail);
       }
-      return callback(job.status, null);
+      return callback(automation.status, null);
     });
   }
 
   /**
-   * Cancel all jobs in the provided array of job ids.
+   * Cancel all automations in the provided array of automation ids.
    *
-   * @param {Array<String>} ids -Array of job ids that the user wishes to cancel
+   * @param {Array<String>} ids -Array of automation ids that the user wishes to cancel
    * @param {function callback(success, failure)} - a function that returns a success or failure message
    * @returns - cancelation status or failure message
    */
-  async cancelJobs(ids, callback) {
+  async cancelAutomations(ids, callback) {
     try {
       let token = '';
       await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
@@ -11192,7 +11196,7 @@ class OperationsManagerAPI {
    * @param {JSON} formData -optional form data to specifiy for the trigger
    * @param {function callback(success, fail)} - a function that returns a success or fail message
    */
-  async startJob(automationName, triggerName, callback, formData = {}) {
+  async startAutomation(automationName, triggerName, callback, formData = {}) {
     try {
       let token = '';
       await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
@@ -11220,8 +11224,8 @@ class OperationsManagerAPI {
           for (let y = 0; y < triggers.length; y++) {
             if (triggers[y].name === triggerName) {
               const triggerId = triggers[y]._id;
-              const startJobUrl = `${this.baseURL}/operations-manager/triggers/manual/${triggerId}/run?token=${token}`;
-              const res = await lib_axios.post(startJobUrl, formData);
+              const startautomationUrl = `${this.baseURL}/operations-manager/triggers/manual/${triggerId}/run?token=${token}`;
+              const res = await lib_axios.post(startautomationUrl, {formData});
               return callback(res.data, null);
             }
           }
@@ -11241,7 +11245,7 @@ class OperationsManagerAPI {
    * @param {JSON} apiEndpointBody -optional data to specifiy for the trigger
    * @param {function callback(success, fail)} - a function that returns a success or fail message
    */
-  async startJobEndpoint(apiEndpoint, apiEndpointBody = {}, callback) {
+  async startAutomationEndpoint(apiEndpoint, apiEndpointBody = {}, callback) {
 
     try {
       let token = '';
@@ -11360,9 +11364,7 @@ class HealthAPI {
 
 const ItentialSDK = { Authentication: Authentication, GenericAPI: GenericAPI, JSONFormsAPI: JSONFormsAPI, OperationsManagerAPI: OperationsManagerAPI, TransformationsAPI: TransformationsAPI, HealthAPI: HealthAPI}
 ;// CONCATENATED MODULE: ./src/action.js
-//const { getInput, setOutput, setFailed } = require("@actions/core");
 
-//const { get, post } = require('axios')
 
 
 
@@ -11370,19 +11372,19 @@ const ItentialSDK = { Authentication: Authentication, GenericAPI: GenericAPI, JS
 async function run() {
 
    //test variables
-  /*const iap_token = 'MzRhNTFhMDczM2Q5OTVmNzk5ZGVlYTBjZGQxN2MyODY=';
-  const api_endpoint_body = {};
+  /*const iap_token = 'YjcwMTMwNmI1MDFiMzAzNTJjOWFiNzg2YTYxNjJkYTU=';
+  const api_endpoint_body = {"time": "34", "endtime": "56"};
   const time_interval = 15;
   const no_of_attempts = 10;
   const automation_status = 1;
   let iap_instance = 'https://itential-se-poc-stg-221.trial.itential.io/';
   if (iap_instance.endsWith('/'))
     iap_instance = iap_instance.substring(0, iap_instance.length - 1);
-  let api_endpoint = 'Scott';
+  let api_endpoint = 'test_route';
   if (api_endpoint.startsWith('/'))
     api_endpoint = api_endpoint.substring(1);
-  */
- 
+    */
+  
   const iap_token = (0,core.getInput)("iap_token");
   const api_endpoint_body = JSON.parse((0,core.getInput)("api_endpoint_body"));
   const time_interval = (0,core.getInput)("time_interval");
@@ -11454,15 +11456,15 @@ async function run() {
     //check the status of the automation and return the output (IAP release > 2021.1)
     const automationStatus221 = (automation_id) => {
 
-      console.log("sdk integrated");
+      console.log("updated sdk integrated");
 
-      opsManager.getJobResult(automation_id, (res,err) => {
+      opsManager.getAutomationResult(automation_id, (res,err) => {
         if (err){
           if (typeof err === "string") {
             (0,core.setFailed)(err);
-          } else {
+          } else if(typeof err.response === "object") {
             (0,core.setFailed)(err.response.data);
-          }
+          } else (0,core.setFailed)("Failed while getting automation result: Please check the instance configuration and credentials");
         } else {
           console.log("Automation Status: ", res.status);
           if (res.status === "running" && count < no_of_attempts) {
@@ -11495,7 +11497,11 @@ async function run() {
         console.log("checked the health");
 
         if(err){
-          (0,core.setFailed)(err.response.data);
+          if(typeof err === "string"){
+            (0,core.setFailed)(err);
+           } else if(typeof err.response === "object") {
+             (0,core.setFailed)(err.response.data);
+           } else (0,core.setFailed)("Failed while checking server health: Please check the instance configuration and credentials");
         } else {
 
           const release = res.release.substring(
@@ -11503,12 +11509,16 @@ async function run() {
             res.release.lastIndexOf(".")
           );
 
-          opsManager.startJobEndpoint(api_endpoint, api_endpoint_body, (res, err)=> {
+          opsManager.startAutomationEndpoint(api_endpoint, api_endpoint_body, (res, err)=> {
 
             console.log("triggered endpoint using sdk");
 
             if(err){
-              (0,core.setFailed)(err.response.data);
+              if(typeof err === "string"){
+                (0,core.setFailed)(err);
+              } else if(typeof err.response === "object") {
+                (0,core.setFailed)(err.response.data);
+              } else (0,core.setFailed)("Failed while triggering automation: Please check the instance configuration and credentials");
             }else {
               if (Boolean(Number(automation_status)) === true) {
                 if (Number(release) <= 2021.1) automationStatus211(res._id);
