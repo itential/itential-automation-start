@@ -145,7 +145,7 @@ async function run() {
                 setFailed(err);
               } else if(typeof err.response === "object") {
                 setFailed(err.response.data);
-              } else setFailed(`Failed while triggering automation: Please check the instance configuration and credentials
+              } else setFailed(`Failed while starting automation: Please check the instance configuration and credentials
                 An Itential account is required to get credentials needed to configure the Github Actions.
                 In order to utilize this action, you would need to have an active \`Itential Automation Platform\` (IAP).
                 If you are an existing customer, please contact your Itential account team for additional details.

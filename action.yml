@@ -1,5 +1,5 @@
-name: 'itential-trigger-automation'
-description: 'Action to trigger Itential Automation Platform(IAP) automations'
+name: 'itential-automation-start'
+description: 'Action to Start Itential Automation Platform(IAP) automations'
 author: 'Itential'
 branding:
   icon: 'activity'
@@ -12,10 +12,10 @@ inputs:
     description: 'Token required to access IAP instance'
     required: true
   api_endpoint:
-    description: 'API endpoint name to trigger an automation'
+    description: 'API endpoint name to start an automation'
     required: true
   api_endpoint_body:
-    description: 'The payload required to trigger an automation'
+    description: 'The payload required to start an automation'
     required: true
     default: '{}'
   time_interval:

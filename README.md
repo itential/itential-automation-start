@@ -110,7 +110,7 @@ jobs:
     outputs:
       #step1 output
       output1: ${{ steps.step1.outputs.results }}
-    name: API Endpoint Trigger
+    name: Automation start
     steps:
       # To use this repository's private action, you must checkout the repository
       - name: Checkout

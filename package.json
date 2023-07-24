@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/itential/itential-trigger-automation.git"
+    "url": "git+https://github.com/itential/itential-automation-start.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/itential/itential-trigger-automation/issues"
+    "url": "https://github.com/itential/itential-automation-start/issues"
   },
-  "homepage": "https://github.com/itential/itential-trigger-automation#readme",
+  "homepage": "https://github.com/itential/itential-automation-start#readme",
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/github": "^5.1.1",

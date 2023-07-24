@@ -5926,77 +5926,77 @@ exports["default"] = _default;
 /***/ 9491:
 /***/ ((module) => {
 
-module.exports = require("assert");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("assert");
 
 /***/ }),
 
 /***/ 6113:
 /***/ ((module) => {
 
-module.exports = require("crypto");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("crypto");
 
 /***/ }),
 
 /***/ 2361:
 /***/ ((module) => {
 
-module.exports = require("events");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("events");
 
 /***/ }),
 
 /***/ 7147:
 /***/ ((module) => {
 
-module.exports = require("fs");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("fs");
 
 /***/ }),
 
 /***/ 3685:
 /***/ ((module) => {
 
-module.exports = require("http");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("http");
 
 /***/ }),
 
 /***/ 5687:
 /***/ ((module) => {
 
-module.exports = require("https");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("https");
 
 /***/ }),
 
 /***/ 1808:
 /***/ ((module) => {
 
-module.exports = require("net");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("net");
 
 /***/ }),
 
 /***/ 2037:
 /***/ ((module) => {
 
-module.exports = require("os");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("os");
 
 /***/ }),
 
 /***/ 1017:
 /***/ ((module) => {
 
-module.exports = require("path");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("path");
 
 /***/ }),
 
 /***/ 2781:
 /***/ ((module) => {
 
-module.exports = require("stream");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("stream");
 
 /***/ }),
 
 /***/ 4404:
 /***/ ((module) => {
 
-module.exports = require("tls");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("tls");
 
 /***/ }),
 
@@ -6010,14 +6010,14 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("tty");
 /***/ 7310:
 /***/ ((module) => {
 
-module.exports = require("url");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("url");
 
 /***/ }),
 
 /***/ 3837:
 /***/ ((module) => {
 
-module.exports = require("util");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("util");
 
 /***/ }),
 
@@ -8154,7 +8154,7 @@ var external_util_ = __nccwpck_require__(3837);
 // EXTERNAL MODULE: ./node_modules/follow-redirects/index.js
 var follow_redirects = __nccwpck_require__(7707);
 ;// CONCATENATED MODULE: external "zlib"
-const external_zlib_namespaceObject = require("zlib");
+const external_zlib_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("zlib");
 ;// CONCATENATED MODULE: ./node_modules/axios/lib/env/data.js
 const VERSION = "1.4.0";
 ;// CONCATENATED MODULE: ./node_modules/axios/lib/helpers/parseProtocol.js
@@ -11509,7 +11509,7 @@ async function run() {
                 (0,core.setFailed)(err);
               } else if(typeof err.response === "object") {
                 (0,core.setFailed)(err.response.data);
-              } else (0,core.setFailed)(`Failed while triggering automation: Please check the instance configuration and credentials
+              } else (0,core.setFailed)(`Failed while starting automation: Please check the instance configuration and credentials
                 An Itential account is required to get credentials needed to configure the Github Actions.
                 In order to utilize this action, you would need to have an active \`Itential Automation Platform\` (IAP).
                 If you are an existing customer, please contact your Itential account team for additional details.
