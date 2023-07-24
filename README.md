@@ -20,14 +20,14 @@ In order to utilize this action, you would need to have an active `Itential Auto
 If you are an existing customer, please contact your Itential account team for additional details.
 For new customers interested in an Itential trial, please click [here](https://www.itential.com/get-started/) to request one.
 
-## Supported Itential Automation Platform Versions #Review
+## Supported Itential Automation Platform Versions
 
 * 2023.1
 * 2022.1
 * 2021.2
 * 2021.1
 
-## Getting Started #Review
+## Getting Started
 
 1. Search for the Action on Github Marketplace.
 2. Select the "Use the Latest Version" option on the top right of the screen.
