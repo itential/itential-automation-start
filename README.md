@@ -1,4 +1,4 @@
-# Itential Automation start Action
+# Itential Automation Start Action
 A Github action that will start Itential automations.
 
 ## Table of Contents 
