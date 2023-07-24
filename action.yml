@@ -5,26 +5,26 @@ branding:
   icon: 'activity'
   color: 'blue'
 inputs:
-  IAP_INSTANCE:
+  iap_instance:
     description: 'Itential Automation Platform instance url'
     required: true
-  IAP_TOKEN:
+  iap_token:
     description: 'Token required to access IAP instance'
     required: true
-  API_ENDPOINT:
+  api_endpoint:
     description: 'API endpoint name to trigger an automation'
     required: true
-  API_ENDPOINT_BODY:
+  api_endpoint_body:
     description: 'The payload required to trigger an automation'
     required: true
     default: '{}'
-  TIMEOUT:
+  time_interval:
     description: 'Time interval to check automation status'
     default: '15'
-  NO_OF_ATTEMPTS:
+  no_of_attempts:
     description: 'No. of attempts to check automation status'
     default: '10'
-  JOB_STATUS:
+  automation_status:
     description: 'If set to 1 it will wait for the automation status and if set to 0 it will not monitor the automation'
     default: '1'
 
