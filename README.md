@@ -35,7 +35,7 @@ For new customers interested in an Itential trial, please click [here](https://w
 4. Navigate to the '.github/workflows' file in the target repository (where you intend on using the action).
 5. Paste the copied data in the correlating fields.
 6. Configure the required inputs and optional inputs. (See note)
-7. Save it as a action.yml file.
+7. Save it as a main.yml file.
 
 Note: Users may manually enter required input parameters or use Github Secrets if they want to hide certain parameters. If you choose to use Github Secrets, please reference the instructions provided below.
 
