@@ -58,14 +58,41 @@ _For more information about metadata, see [metadata](https://docs.github.com/en/
 
 ### Required Input Parameters
 
-The following table defines the four required parameters to run an IAP automation using a Github workflow.
+The following table defines the required input parameters to run an Itential automation using a Github workflow.
 
 | Parameter         | Description                                      |
 | ----------------- | ------------------------------------------------ |
 | itential_host_url | URL to the Itential Instance.                    |
-| auth_token        | To authenticate API requests to the instance.    |
 | api_endpoint      | API endpoint name to start an automation.        |
 | api_endpoint_body | The POST body used to create the workflow input. |
+
+#### Required Authentication Parameters
+
+There are three methods for authenticating API requests to the Itential instance.The following tables describe the required parameters for each authentication method.Based on the available credentials input the appropriate parameters. By default, all the authentication parameters are set to empty string.
+
+* Static Token
+The provided Static token will be used in all subsequent API calls to the Itential instance 
+
+| Parameter         | Description                                      |
+| ----------------- | ------------------------------------------------ |
+| auth_token        |  Itential Authentication Token                   |
+
+* Basic Token 
+The provided username and password is used to request a token that will be used in all subsequent API calls to the Itential instance . 
+
+| Parameter         | Description                                      |
+| ----------------- | ------------------------------------------------ |
+| auth_username     | Itential Authentication Username                 |
+| auth_password     | Itential Authentication Password                 |
+
+* Oauth2 Client Credentials
+The provided client credentials are used to request a token that will be used in all subsequent API calls to the Itential instance .
+
+| Parameter         | Description                                       |
+| ----------------- | --------------------------------------------------|
+| auth_client_id    | Itential Authentication Client ID                 |
+| auth_client_secret| Itential Authentication Client Secret             |
+
 
 ### Optional Input Parameters
 
@@ -120,15 +147,18 @@ jobs:
         id: step1
         uses: itential/itential-automation-start@version_number
         with:
-          #Inputs required to run the action and start IAP automation
+          #github_token: ${{secrets.GITHUB_TOKEN}} # include only if you have a Github token
           itential_host_url: ${{secrets.ITENTIAL_HOST_URL}}
           auth_token: ${{secrets.AUTH_TOKEN}}
+          auth_username: ${{secrets.AUTH_USERNAME}}
+          auth_password: ${{secrets.AUTH_PASSWORD}}
+          auth_client_id: ${{secrets.AUTH_CLIENT_ID}}
+          auth_client_secret: ${{secrets.AUTH_CLIENT_SECRET}}
+          time_interval: 1
+          no_of_attempts: 200
           api_endpoint: ${{secrets.API_ENDPOINT}}
           api_endpoint_body: ${{secrets.API_ENDPOINT_BODY}}
-          #Additional inputs to wait for automation completion and get output results.
           automation_status: 1
-          no_of_attempts: 10
-          time_interval: 15
       - name: Get output
         run: echo "${{steps.step1.outputs.results}}"
 ```

@@ -10,7 +10,6 @@ async function run() {
   const auth_password = getInput("auth_password");
   const auth_client_id = getInput("auth_client_id");
   const auth_client_secret = getInput("auth_client_secret");
-  const auth_grant_type = getInput("auth_grant_type");
   const api_endpoint_body = JSON.parse(getInput("api_endpoint_body"));
   const time_interval = getInput("time_interval");
   const no_of_attempts = getInput("no_of_attempts");
@@ -21,6 +20,7 @@ async function run() {
   let api_endpoint = getInput("api_endpoint");
   if (api_endpoint.startsWith('/'))
     api_endpoint = api_endpoint.substring(1);
+  const auth_grant_type = "client_credentials";
 
   let count = 0;
 

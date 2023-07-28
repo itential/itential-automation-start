@@ -23,9 +23,6 @@ inputs:
   auth_client_secret:
     description: 'Client Secret is required, if using OAuth2 authentication to access Itential instance'
     default: ''
-  auth_grant_type:
-    description: 'Grant Type is required, if using OAuth2 authentication to access Itential instance'
-    default: ''
   api_endpoint:
     description: 'API endpoint name to start an automation'
     required: true

@@ -34,7 +34,6 @@ jobs:
           auth_password: ${{secrets.AUTH_PASSWORD}}
           auth_client_id: ${{secrets.AUTH_CLIENT_ID}}
           auth_client_secret: ${{secrets.AUTH_CLIENT_SECRET}}
-          auth_grant_type: ${{secrets.AUTH_GRANT_TYPE}}
           #time_interval: 1
           no_of_attempts: 200
           api_endpoint: ${{secrets.API_ENDPOINT}}
