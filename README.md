@@ -38,7 +38,7 @@ For new customers interested in an Itential trial, please click [here](https://w
 6. Configure the required inputs and optional inputs. (See note)
 7. Save it as a main.yml file.
 
-Note: Users may manually enter required input parameters or use Github Secrets if they want to hide certain parameters. If you choose to use Github Secrets, please reference the instructions provided below.
+> **_Note:_** Users may manually enter required input parameters or use Github Secrets if they want to hide certain parameters. If you choose to use Github Secrets, please reference the instructions provided below.
 
 1. Select the settings tab on your target repository.
 2. Select the secrets and variables tab under security options.
@@ -52,15 +52,13 @@ _For more information about Github Actions variables, see [variables](https://do
 
 ## Configurations
 
-[action.yml](action.yml) file defines the metadata for this action.
-
-_For more information about metadata, see [metadata](https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions)._
+See [action.yml](action.yml) for [metadata](https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions) that defines the inputs, outputs, and runs configurations for this action.\_
 
 _For more information about connecting to private network, see [Connecting to a private network](https://docs.github.com/en/actions/using-github-hosted-runners/connecting-to-a-private-network)_
 
 ### Required Input Parameters
 
-The following table defines the required input parameters to run an Itential automation using a Github workflow.
+The following table defines the required input parameters to run an Itential automation using a Github workflow.Input data is provided through Github Actions secrets. For more information about github action secrets, see [Github Secrets](https://docs.github.com/en/rest/actions/secrets?apiVersion=2022-11-28)
 
 | Parameter         | Description                                      |
 | ----------------- | ------------------------------------------------ |
@@ -145,7 +143,7 @@ jobs:
       # To use this repository's private action, you must checkout the repository
       - name: Checkout
         uses: actions/checkout@v3
-      - name: IAP Automation Start action step
+      - name: Itential Automation Start action step
         id: step1
         uses: itential/itential-automation-start@version_number
         with:
