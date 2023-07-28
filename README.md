@@ -5,7 +5,7 @@ A Github action that will start Itential automations.
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
-- [Supported Itential Automation Platform Versions](#supported-iap-versions)
+- [Supported Itential Automation Platform Versions](#supported-itential-automation-platform-versions)
 - [Getting Started](#getting-started)
 - [Configurations](#configurations)
   - [Required Input Parameters](#required-input-parameters)
@@ -13,7 +13,6 @@ A Github action that will start Itential automations.
   - [Optional Input Parameters](#optional-input-parameters)
   - [Output](#output)
 - [Example Usage](#example-usage)
-- [Troubleshhoting]
 
 ## Prerequisites
 
@@ -56,7 +55,8 @@ _For more information about Github Actions variables, see [variables](https://do
 [action.yml](action.yml) file defines the metadata for this action.
 
 _For more information about metadata, see [metadata](https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions)._
-_For more information about connecting to private network, see (https://docs.github.com/en/actions/using-github-hosted-runners/connecting-to-a-private-network)_
+
+_For more information about connecting to private network, see [Connecting to a private network](https://docs.github.com/en/actions/using-github-hosted-runners/connecting-to-a-private-network)_
 
 ### Required Input Parameters
 
@@ -72,14 +72,14 @@ The following table defines the required input parameters to run an Itential aut
 
 There are three methods for authenticating API requests to the Itential instance.The following tables describe the required parameters for each authentication method.Based on the available credentials input the appropriate parameters. By default, all the authentication parameters are set to empty string.
 
-* Static Token
+#### Static Token
 The provided Static token will be used in all subsequent API calls to the Itential instance 
 
 | Parameter         | Description                                      |
 | ----------------- | ------------------------------------------------ |
 | auth_token        |  Itential Authentication Token                   |
 
-* Basic Token 
+#### Basic Token 
 The provided username and password is used to request a token that will be used in all subsequent API calls to the Itential instance . 
 
 | Parameter         | Description                                      |
@@ -87,7 +87,7 @@ The provided username and password is used to request a token that will be used 
 | auth_username     | Itential Authentication Username                 |
 | auth_password     | Itential Authentication Password                 |
 
-* Oauth2 Client Credentials
+#### Oauth2 Client Credentials
 The provided client credentials are used to request a token that will be used in all subsequent API calls to the Itential instance .
 
 | Parameter         | Description                                       |
@@ -104,7 +104,7 @@ The following table defines three parameters considered optional.
 
 | Parameter         | Description                                               | Default Value |
 | ----------------- | --------------------------------------------------------- | ------------- |
-| automation_status | If user want to check the status of the automation        | 1             |
+| automation_status | If user wants to check the status of the automation       | 1             |
 | time_interval     | Time interval to check the automation status (in seconds) | 15            |
 | no_of_attempts    | No. of attempts to check the automation status            | 10            |
 
@@ -149,7 +149,7 @@ jobs:
         id: step1
         uses: itential/itential-automation-start@version_number
         with:
-          #github_token: ${{secrets.GITHUB_TOKEN}} # include only if you have a Github token
+          #github_token: ${{secrets.GITHUB_TOKEN}} # include only if user requires a GitHub Token
           itential_host_url: ${{secrets.ITENTIAL_HOST_URL}}
           auth_token: ${{secrets.AUTH_TOKEN}}
           auth_username: ${{secrets.AUTH_USERNAME}}
