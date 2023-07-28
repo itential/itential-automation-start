@@ -12,16 +12,16 @@ inputs:
     description: 'Token is required, if using static token authentication to access Itential instance'
     default: ''
   auth_username:
-    description: 'Username is required, if using basic authentication to access Itential instance'
+    description: 'Username is required, if using basic token authentication to access Itential instance'
     default: ''
   auth_password:
-    description: 'Password is required, if using basic authentication to access Itential instance'
+    description: 'Password is required, if using basic token authentication to access Itential instance'
     default: ''
   auth_client_id:
-    description: 'Client ID is required, if using OAuth2 authentication to access Itential instance'
+    description: 'Client ID is required, if using OAuth2 client credentials authentication to access Itential instance'
     default: ''
   auth_client_secret:
-    description: 'Client Secret is required, if using OAuth2 authentication to access Itential instance'
+    description: 'Client Secret is required, if using OAuth2 client credentials authentication to access Itential instance'
     default: ''
   api_endpoint:
     description: 'API endpoint name to start an automation'

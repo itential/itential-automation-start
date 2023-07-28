@@ -17,7 +17,7 @@ A Github action that will start Itential automations.
 ## Prerequisites
 
 An Itential account is required to get credentials needed to configure the Github Actions.
-In order to utilize this action, you would need to have an active `Itential Automation Platform` (IAP).\
+In order to utilize this action, you would need to have an active `Itential Automation Platform` (IAP) / `Itential Cloud` instance.\
 If you are an existing customer, please contact your Itential account team for additional details.
 For new customers interested in an Itential trial, please click [here](https://www.itential.com/get-started/) to request one.
 
