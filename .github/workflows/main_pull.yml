@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI_pull_req
+name: Automation start on Pull request
 
 on:
   pull_request:
@@ -28,8 +28,13 @@ jobs:
         uses: ./
         with:
           #github_token: ${{secrets.GITHUB_TOKEN}}
-          iap_token: ${{secrets.IAP_TOKEN}}
-          iap_instance: ${{secrets.IAP_INSTANCE}}
+          itential_host_url: ${{secrets.ITENTIAL_HOST_URL}}
+          auth_token: ${{secrets.AUTH_TOKEN}}
+          auth_username: ${{secrets.AUTH_USERNAME}}
+          auth_password: ${{secrets.AUTH_PASSWORD}}
+          auth_client_id: ${{secrets.AUTH_CLIENT_ID}}
+          auth_client_secret: ${{secrets.AUTH_CLIENT_SECRET}}
+          auth_grant_type: ${{secrets.AUTH_GRANT_TYPE}}
           #time_interval: 1
           no_of_attempts: 200
           api_endpoint: ${{secrets.API_ENDPOINT}}

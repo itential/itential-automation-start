@@ -9,6 +9,7 @@ A Github action that will start Itential automations.
 - [Getting Started](#getting-started)
 - [Configurations](#configurations)
   - [Required Input Parameters](#required-input-parameters)
+  - [Required Input Parameters for Authentication](#required-input-parameters-for-authentication)
   - [Optional Input Parameters](#optional-input-parameters)
   - [Output](#output)
 - [Example Usage](#example-usage)
@@ -61,8 +62,8 @@ The following table defines the four required parameters to run an IAP automatio
 
 | Parameter         | Description                                      |
 | ----------------- | ------------------------------------------------ |
-| iap_instance      | URL to the IAP Instance.                         |
-| iap_token         | To authenticate API requests to the instance.    |
+| itential_host_url | URL to the Itential Instance.                    |
+| auth_token        | To authenticate API requests to the instance.    |
 | api_endpoint      | API endpoint name to start an automation.        |
 | api_endpoint_body | The POST body used to create the workflow input. |
 
@@ -120,8 +121,8 @@ jobs:
         uses: itential/itential-automation-start@version_number
         with:
           #Inputs required to run the action and start IAP automation
-          iap_instance: ${{secrets.IAP_INSTANCE}}
-          iap_token: ${{secrets.IAP_TOKEN}}
+          itential_host_url: ${{secrets.ITENTIAL_HOST_URL}}
+          auth_token: ${{secrets.AUTH_TOKEN}}
           api_endpoint: ${{secrets.API_ENDPOINT}}
           api_endpoint_body: ${{secrets.API_ENDPOINT_BODY}}
           #Additional inputs to wait for automation completion and get output results.

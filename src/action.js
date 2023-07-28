@@ -3,42 +3,73 @@ import axios from 'axios'
 import { ItentialSDK } from "ea-utils/sdk.js";
 
 async function run() {
-  
-  const iap_token = getInput("iap_token");
+
+  // testing code 
+  /*const auth_token = "";//'YjcwMTMwNmI1MDFiMzAzNTJjOWFiNzg2YTYxNjJkYTU=';
+  const auth_username = "";//getInput("auth_username");
+  const auth_password = "";//getInput("auth_password");
+  const auth_client_id = "6489e83007ef9200071b3982";
+  const auth_client_secret = "0cbd84b9-fd66-4535-aa34-52c5a57c2695";
+  const auth_grant_type = "client_credentials";
+  const api_endpoint_body = {"time": "15", "endtime": "45"};
+  const time_interval = "3";
+  const no_of_attempts = "20";
+  const automation_status = "1";
+  let itential_host_url = "https://automation-platform-20231.latest.uat.itential.io/";//'https://itential-se-poc-stg-221.trial.itential.io';//"https://automation-platform-20231.latest.uat.itential.io/"; ; 
+  if (itential_host_url.endsWith('/'))
+    itential_host_url = itential_host_url.substring(0, itential_host_url.length - 1);
+  let api_endpoint = "test_route";
+  if (api_endpoint.startsWith('/'))
+    api_endpoint = api_endpoint.substring(1);
+  */
+
+  const auth_token = getInput("auth_token");
+  const auth_username = getInput("auth_username");
+  const auth_password = getInput("auth_password");
+  const auth_client_id = getInput("auth_client_id");
+  const auth_client_secret = getInput("auth_client_secret");
+  const auth_grant_type = getInput("auth_grant_type");
   const api_endpoint_body = JSON.parse(getInput("api_endpoint_body"));
   const time_interval = getInput("time_interval");
   const no_of_attempts = getInput("no_of_attempts");
   const automation_status = getInput("automation_status");
-  let iap_instance = getInput("iap_instance");
-  if (iap_instance.endsWith('/'))
-    iap_instance = iap_instance.substring(0, iap_instance.length - 1);
+  let itential_host_url = getInput("itential_host_url");
+  if (itential_host_url.endsWith('/'))
+    itential_host_url = itential_host_url.substring(0, itential_host_url.length - 1);
   let api_endpoint = getInput("api_endpoint");
   if (api_endpoint.startsWith('/'))
     api_endpoint = api_endpoint.substring(1);
-  
+
   let count = 0;
 
-   //using the ea-utils library
+  //using the ea-utils library
    const user = [
     {
-      hostname: iap_instance,
-      username: '',
-      password: '',
-      token: iap_token
+      hostname: itential_host_url,
+      username: auth_username,
+      password: auth_password,
+      client_id: auth_client_id,
+      client_secret: auth_client_secret,
+      grant_type: auth_grant_type,
+      token: auth_token
     }
   ]
 
   const authentication = new ItentialSDK.Authentication(user); 
-  const opsManager = new ItentialSDK.OperationsManagerAPI(authentication.users[0].hostname, authentication.users[0].userKey, authentication);
+  const opsApi = new ItentialSDK.OperationsAPI(authentication.users[0].hostname, authentication.users[0].userKey, authentication);
   const health = new ItentialSDK.HealthAPI(authentication.users[0].hostname, authentication.users[0].userKey, authentication);
-  
+  const message = "An Itential account is required to get credentials needed to configure the Github Actions." + 
+  "In order to utilize this action, you would need to have an active \`Itential Automation Platform\` (IAP)." + 
+  "If you are an existing customer, please contact your Itential account team for additional details." + 
+  "For new customers interested in an Itential trial, please click [here](https://www.itential.com/get-started/) to request one."
+
   try {
     //check the status of the automation and return the output (IAP release <= 2021.1)
     const automationStatus211 = (automation_id) => {
       axios
       .get(
-        `${iap_instance}/workflow_engine/job/${automation_id}/details?token=` +
-        iap_token
+        `${itential_host_url}/workflow_engine/job/${automation_id}/details?token=` +
+        authentication.users[0].token
       )
         .then((res) => {
           console.log("Automation Status: ", res.data.status);
@@ -50,8 +81,8 @@ async function run() {
           } else if (res.data.status === "complete") {
             axios
             .get(
-              `${iap_instance}/workflow_engine/job/${automation_id}/output?token=` +
-              iap_token
+              `${itential_host_url}/workflow_engine/job/${automation_id}/output?token=` +
+              authentication.users[0].token
             )
               .then((res) => {
                 setOutput("results", res.data.variables); 
@@ -77,17 +108,12 @@ async function run() {
     //check the status of the automation and return the output (IAP release > 2021.1)
     const automationStatus221 = (automation_id) => {
 
-      opsManager.getAutomationResult(automation_id, (res,err) => {
+      opsApi.getAutomationResult(automation_id, (res,err) => {
         if (err){
-          if (typeof err === "string") {
-            setFailed(err);
-          } else if(typeof err.response === "object") {
-            setFailed(err.response.data);
-          } else setFailed(`Failed while getting automation result: Please check the instance configuration and credentials
-          An Itential account is required to get credentials needed to configure the Github Actions.
-          In order to utilize this action, you would need to have an active \`Itential Automation Platform\` (IAP).
-          If you are an existing customer, please contact your Itential account team for additional details.
-          For new customers interested in an Itential trial, please click [here](https://www.itential.com/get-started/) to request one.`);
+          if(typeof err.IAPerror.stack === "object" && typeof err.IAPerror.stack.response === "object" ) {
+            setFailed("origin:" + err.IAPerror.origin + ";" + err.IAPerror.stack.response.data);
+
+          } else setFailed("Failed while getting automation result: " + message);
 
         } else {
           console.log("Automation Status: ", res.status);
@@ -119,17 +145,11 @@ async function run() {
       health.getServerHealth((res, err)=> {
 
         if(err){
-          if(typeof err === "string"){
-            setFailed(err);
 
-          } else if(typeof err.response === "object") {
-            setFailed(err.response.data);
+          if(typeof err.IAPerror.stack === "object" && typeof err.IAPerror.stack.response === "object" ) {
+            setFailed("origin:" + err.IAPerror.origin + ";" + err.IAPerror.stack.response.data);
 
-          } else setFailed(`Failed while checking server health: Please check the instance configuration and credentials
-            An Itential account is required to get credentials needed to configure the Github Actions.
-            In order to utilize this action, you would need to have an active \`Itential Automation Platform\` (IAP).
-            If you are an existing customer, please contact your Itential account team for additional details.
-            For new customers interested in an Itential trial, please click [here](https://www.itential.com/get-started/) to request one.`);
+          } else setFailed("Failed while server health check: " + message);
 
         } else {
 
@@ -138,18 +158,20 @@ async function run() {
             res.release.lastIndexOf(".")
           );
 
-          opsManager.startAutomationEndpoint(api_endpoint, api_endpoint_body, (res, err)=> {
+          opsApi.startAutomationEndpoint(api_endpoint, api_endpoint_body, (res, err)=> {
 
             if(err){
-              if(typeof err === "string"){
-                setFailed(err);
-              } else if(typeof err.response === "object") {
-                setFailed(err.response.data);
-              } else setFailed(`Failed while starting automation: Please check the instance configuration and credentials
-                An Itential account is required to get credentials needed to configure the Github Actions.
-                In order to utilize this action, you would need to have an active \`Itential Automation Platform\` (IAP).
-                If you are an existing customer, please contact your Itential account team for additional details.
-                For new customers interested in an Itential trial, please click [here](https://www.itential.com/get-started/) to request one.`);
+              
+             if(typeof err.IAPerror.stack === "object" && typeof err.IAPerror.stack.response === "object" ) {
+                if(typeof err.IAPerror.stack.response.data === "object"){
+                  setFailed("origin:" + err.IAPerror.origin + ";" + err.IAPerror.stack.response.data.message);
+                }
+                
+                else{
+                  setFailed("origin:" + err.IAPerror.origin + ";" + err.IAPerror.stack.response.data);
+                }
+                
+              } else setFailed("Failed while starting automation: " + message);
             }else {
               if (Boolean(Number(automation_status)) === true) {
                 if (Number(release) <= 2021.1) automationStatus211(res._id);
