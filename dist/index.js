@@ -11737,6 +11737,7 @@ async function run() {
         .then((res) => {
           console.log("Automation Status: ", res.data.status);
           if (res.data.status === "running" && count < no_of_attempts) {
+            console.log(" Getting Status Attempt # ", count);
             setTimeout(() => {
               count += 1;
               automationStatus211(automation_id);
@@ -11747,7 +11748,7 @@ async function run() {
               authentication.users[0].token
             )
               .then((res) => {
-                (0,core.setOutput)("results", res.data.variables); 
+                (0,core.setOutput)("results", res.data); 
               })
               .catch((err) => {
                 (0,core.setFailed)(err.response.data);
@@ -11780,7 +11781,7 @@ async function run() {
         } else {
           console.log("Automation Status: ", res.status);
           if (res.status === "running" && count < no_of_attempts) {
-            console.log(" Attempt # ", count);
+            console.log(" Getting Status Attempt # ", count);
             setTimeout(() => {
               count += 1;
               automationStatus221(automation_id);
