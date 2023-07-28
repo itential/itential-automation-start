@@ -4,24 +4,6 @@ import { ItentialSDK } from "ea-utils/sdk.js";
 
 async function run() {
 
-  // testing code 
-  /*const auth_token = "";//'YjcwMTMwNmI1MDFiMzAzNTJjOWFiNzg2YTYxNjJkYTU=';
-  const auth_username = "";//getInput("auth_username");
-  const auth_password = "";//getInput("auth_password");
-  const auth_client_id = "6489e83007ef9200071b3982";
-  const auth_client_secret = "0cbd84b9-fd66-4535-aa34-52c5a57c2695";
-  const auth_grant_type = "client_credentials";
-  const api_endpoint_body = {"time": "15", "endtime": "45"};
-  const time_interval = "3";
-  const no_of_attempts = "20";
-  const automation_status = "1";
-  let itential_host_url = "https://automation-platform-20231.latest.uat.itential.io/";//'https://itential-se-poc-stg-221.trial.itential.io';//"https://automation-platform-20231.latest.uat.itential.io/"; ; 
-  if (itential_host_url.endsWith('/'))
-    itential_host_url = itential_host_url.substring(0, itential_host_url.length - 1);
-  let api_endpoint = "test_route";
-  if (api_endpoint.startsWith('/'))
-    api_endpoint = api_endpoint.substring(1);
-  */
 
   const auth_token = getInput("auth_token");
   const auth_username = getInput("auth_username");
@@ -74,6 +56,7 @@ async function run() {
         .then((res) => {
           console.log("Automation Status: ", res.data.status);
           if (res.data.status === "running" && count < no_of_attempts) {
+            console.log(" Getting Status Attempt # ", count);
             setTimeout(() => {
               count += 1;
               automationStatus211(automation_id);
@@ -85,7 +68,7 @@ async function run() {
               authentication.users[0].token
             )
               .then((res) => {
-                setOutput("results", res.data.variables); 
+                setOutput("results", res.data); 
               })
               .catch((err) => {
                 setFailed(err.response.data);
@@ -118,7 +101,7 @@ async function run() {
         } else {
           console.log("Automation Status: ", res.status);
           if (res.status === "running" && count < no_of_attempts) {
-            console.log(" Attempt # ", count);
+            console.log(" Getting Status Attempt # ", count);
             setTimeout(() => {
               count += 1;
               automationStatus221(automation_id);
