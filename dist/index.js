@@ -10614,7 +10614,227 @@ axios.default = axios;
 
 ;// CONCATENATED MODULE: external "querystring"
 const external_querystring_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("querystring");
+;// CONCATENATED MODULE: ./node_modules/ea-utils/errors.js
+const errors = [
+      {
+        "key": "Null Arguments",
+        "icode": "AD.100",
+        "displayString": "One or more method arguemnts are null: $VARIABLE$ $VARIABLE$ $VARIABLE$",
+        "recommendation": "Verify your arguments are what they expect"
+      },
+      {
+        "key": "Unfinished Automation",
+        "icode": "AD.101",
+        "displayString": "Automation $VARIABLE$ is not finished! Automation State: $VARIABLE$",
+        "recommendation": "Wait for the automation to finish before retrieving metrics"
+      },
+      {
+        "key": "Axios Error",
+        "icode": "AD.102",
+        "displayString": "Error making the HTTP Request",
+        "recommendation": "Verify that your url and request parameters are correct"
+      },
+      {
+        "key": "Empty Arguments",
+        "icode": "AD.110",
+        "displayString": "One or more method arguemnts are empty: $VARIABLE$ $VARIABLE$ $VARIABLE$",
+        "recommendation": "Ensure your method arguments are not being passed as empty strings or arrays"
+      },
+      {
+        "key": "Can't Find Trigger",
+        "icode": "AD.111",
+        "displayString": "Unable to find trigger: $VARIABLE$ when attempting to start automation $VARIABLE$",
+        "recommendation": "Verify that the correct trigger name is specified in the method arguments"
+      },
+      {
+        "key": "Can't Find Automation",
+        "icode": "AD.112",
+        "displayString": "Unable to find automation: $VARIABLE$",
+        "recommendation": "Verify that the correct automation name is specified in the method arguments"
+      },
+      {
+        "key": "Invalid HTTP Method",
+        "icode": "AD.113",
+        "displayString": "The HTTP Method you specificed was invalid",
+        "recommendation": "Enter one of the following for the HTTP Method: GET, PUT, POST, DELETE"
+      },
+      {
+        "key": "Error when fetching or renewing a token",
+        "icode": "AD.300",
+        "displayString": "Error when fetching a new token with credentials: $VARIABLE$ $VARIABLE$",
+        "recommendation": "Ensure your username and password (or permanent token) are correct in the application configuration"
+      },
+      {
+        "key": "Error when fetching or renewing an OAuth token",
+        "icode": "AD.301",
+        "displayString": "Error when fetching a new token with credentials: $VARIABLE$ $VARIABLE$ $VARIABLE$",
+        "recommendation": "Ensure your OAuth credentials are correct"
+      },
+      {
+        "key": "User Validation Error",
+        "icode": "AD.302",
+        "displayString": "For $VARIABLE$ authentication, manadatory properties $VARIABLE$ is missing",
+        "recommendation": "Ensure your user object has the correct properties"
+      },
+      {
+        "key": "User doesn't exist",
+        "icode": "AD.303",
+        "displayString": "User doesn't exist: the authentication id doesn't match what exists in the table",
+        "recommendation": "Ensure your your authenticaion credentials are correct"
+      },
+      {
+        "key": "Token doesn't exist",
+        "icode": "AD.303",
+        "displayString": "Username/Password nor token present for verification",
+        "recommendation": "Ensure your account either can be authenticated via username/password or token"
+      }
+];
+;// CONCATENATED MODULE: ./node_modules/ea-utils/utils.js
+
+
+class Utils {
+    
+    constructor(){
+        this.errors = errors;
+    }
+
+    /**
+    * @summary Build a standard error object from the data provided
+    *
+    * @function formatErrorObject
+    * @param {String} origin - the originator of the error (optional).
+    * @param {String} type - the internal error type (optional).
+    * @param {Array} variables - the variables to put into the error message (optional).
+    * @param {Integer} sysCode - the error code from the other system (optional).
+    * @param {Object} sysRes - the raw response from the other system (optional).
+    * @param {Exception} stack - any available stack trace from the issue (optional).
+    *
+    * @return {Object} - the error object, null if missing pertinent information
+    */
+    formatErrorObject(origin, type, variables, sysCode, sysRes, stack){
+        // add the required fields
+        const errorObject = {
+            icode: 'AD.999',
+            IAPerror: {
+                origin: `Itential EcoSystem Applications SDK`,
+                displayString: 'error not provided',
+                recommendation: 'report this issue to the ecosystem applications team!'
+            }
+        };
+
+        if (origin) {
+            errorObject.IAPerror.origin = origin;
+        }
+        if (type) {
+            errorObject.IAPerror.displayString = type;
+        }
+
+        // add the messages from the error.json
+        for (let e = 0; e < this.errors.length; e += 1) {
+            if (this.errors[e].key === type) {
+                errorObject.icode = this.errors[e].icode;
+                errorObject.IAPerror.displayString = this.errors[e].displayString;
+                errorObject.IAPerror.recommendation = this.errors[e].recommendation;
+            } else if (this.errors[e].icode === type) {
+                errorObject.icode = this.errors[e].icode;
+                errorObject.IAPerror.displayString = this.errors[e].displayString;
+                errorObject.IAPerror.recommendation = this.errors[e].recommendation;
+            }
+        }
+
+        // replace the variables
+        let varCnt = 0;
+        while (errorObject.IAPerror.displayString.indexOf('$VARIABLE$') >= 0) {
+            let curVar = '';
+
+            // get the current variable
+            if (variables && Array.isArray(variables) && variables.length >= varCnt + 1) {
+                curVar = variables[varCnt];
+            }
+            varCnt += 1;
+            errorObject.IAPerror.displayString = errorObject.IAPerror.displayString.replace('$VARIABLE$', curVar);
+        }
+
+        // add all of the optional fields
+        if (sysCode) {
+            errorObject.IAPerror.code = sysCode;
+        }
+        if (sysRes) {
+            errorObject.IAPerror.raw_response = sysRes;
+        }
+
+        // Mask sensitive fields in reqHdr
+        const sensitiveWords = /auth|token|x|key/i;
+        if (errorObject.IAPerror.raw_response && errorObject.IAPerror.raw_response.reqHdr) {
+            Object.keys(errorObject.IAPerror.raw_response.reqHdr).forEach((key) => {
+                if (sensitiveWords.test(key)) {
+                errorObject.IAPerror.raw_response.reqHdr[key] = '****';
+                }
+            });
+        }
+
+        if (stack) {
+            errorObject.IAPerror.stack = stack;
+        }
+
+        // return the object
+        return errorObject;
+
+    }
+
+    formatAxiosRequest(baseURL, endpoint, token_object){
+        const authType =  token_object.authType; 
+        const token = token_object.token;
+
+        const formatted_req = {
+            url: null,
+            config: undefined
+        };
+
+        if(authType.basic || authType.staticToken){
+            formatted_req.url = `${baseURL}${endpoint}?token=${token}`;
+
+        }else { // its oAuth type
+            formatted_req.url = `${baseURL}${endpoint}`;
+            formatted_req.config = {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
+            };
+        
+        }
+
+        return formatted_req;
+
+    }
+
+
+    // getMarketingMessage(){
+    //     return <body>
+    //     <div id="root"></div>
+    //     <h1>Customer Support</h1>
+    //     <span> You would need an Itential account to get the credentials to configure the ServiceNow application.</span>
+    //     <br/>
+    //     <span>In order to utilize this application, you would need to have an active
+    //                 Itential Automation Platform (IAP). If you are an existing
+    //                 customer, please contact your Itential account team for
+    //                 additional details. &#xA0;</span> 
+    //     <br/>
+    //     <span> For new customers interested in an Itential trial please click&#xA0; </span>
+    //     <a href="https://www.itential.com/get-started/" target="_blank" rel="noopener noreferrer">here</a>
+    //     <span>&#xA0; to request one.</span>
+    //     <br/>
+    //     <span> Additional details can be found in our &#xA0;</span> <a href="https://docs.itential.com/opensource/docs/servicenow-application" target="_blank" rel="noopener noreferrer"> user guide</a>
+    //     <br/>
+    //     <span> Reach out to Itential for additional ServiceNow application support. &#xA0;</span> <a href="mailto:snow@itential.com">snow@itential.com</a>
+    //     <br/>
+    //     <a href="https://www.itential.com/" target="_blank" rel="noopener noreferrer">Itential</a>
+    // </body>
+    // }
+
+}
 ;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/authApi.js
+
 
 
 
@@ -10622,6 +10842,7 @@ class Authentication {
   constructor(instanceList) {
     this.default_expiry_duration = 60; // in minutes, set it to 60 minutes
     this.users = this.validateList(instanceList);
+    this.utils = new Utils();
   }
 
   getIndex(authId) {
@@ -10674,7 +10895,8 @@ class Authentication {
       console.log('the new token', this.users[indx].expires_in);
       return callback(this.users[indx].token);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("authentication-getNewPasswToken", "Error when fetching or renewing a token", null, null, null, err);
+      return callback(null, error);
     }
   }
 
@@ -10699,7 +10921,8 @@ class Authentication {
       console.log('the renewed token ', this.users[indx].token);
       return callback(this.users[indx].token);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("authentication-renewPasswToken", "Error when fetching or renewing a token", null, null, null, err);
+      return callback(null, error);
     }
   }
 
@@ -10728,8 +10951,8 @@ class Authentication {
       this.users[indx].expires_in = timeNow.setMinutes(timeNow.getMinutes() + 1);*/
       return callback(this.users[indx].token);
     } catch (err) {
-      console.log('got error');
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("authentication-getNewOAuthToken", "Error when fetching or renewing an OAuth token", null, null, null, err);
+      return callback(null, error);
     }
   }
 
@@ -10757,23 +10980,34 @@ class Authentication {
       console.log('expiry of renewed Token', timeNow);
       return callback(this.users[indx].token);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("authentication-renewOAuthToken", "Error when fetching or renewing an OAuth token", null, null, null, err);
+      return callback(null, error);
     }
   }
 
   async getToken(authId, callback) {
     try {
       const indx = this.getIndex(authId);
-      if (indx === -1) return callback(null, 'User does not exist, authId doesn\'t match');
+      if (indx === -1) {
+        const error = this.utils.formatErrorObject("authentication-getToken", "User doesn't exist", null, null, null, null);
+        return callback(null, error);
+      }
+
+      //valid token return object 
+      const token_object = {
+        token: null,
+        authType: this.users[indx].authType
+      } 
+
       // check if token exists
       if (this.users[indx].token.length !== 0) {
         // check token validity
         const valid = this.checkTokenValidity(indx);
         // if valid return value
         if (valid === true) {
-          return callback(this.users[indx].token); // token exists
+          token_object.token =  this.users[indx].token;
+          return callback(token_object); // token exists
         }
-
         // else renew token
         // if OAuth user
         if (this.users[indx].authType.oAuth) {
@@ -10781,7 +11015,8 @@ class Authentication {
             if (err) {
               return callback(null, err);
             }
-            return callback(res);
+            token_object.token = res;
+            return callback(token_object);
           });
         } else {
           // else password user
@@ -10789,7 +11024,8 @@ class Authentication {
             if (err) {
               return callback(null, err);
             }
-            return callback(res);
+            token_object.token = res;
+            return callback(token_object);
           });
         }
       } else if (this.users[indx].authType.oAuth) {
@@ -10800,24 +11036,26 @@ class Authentication {
             return callback(null, err);
           }
           console.log('not here');
-          return callback(res);
+          token_object.token = res;
+          return callback(token_object);
         });
-      } else if (this.users[indx].authType.passwordBased) {
+      } else if (this.users[indx].authType.basic) {
         // password user
         await this.getNewPasswToken(indx, (res, err) => {
           if (err) {
             return callback(null, err);
           }
-          return callback(res);
+          token_object.token = res;
+          return callback(token_object);
         });
-      } else return callback(null, 'No token, No password');
+      } else {
+        const error = this.utils.formatErrorObject("authentication-getToken", "Token doesn't exist", null, null, null, null);
+        return callback(null, error);
+      }
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("authentication-getToken", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
-  }
-
-  setUsers(updatedUsers) {
-    this.users = this.validateList(updatedUsers);
   }
 
   getUsers() {
@@ -10826,36 +11064,30 @@ class Authentication {
 
   checkValidUser(checkUser) {
     const user = checkUser;
-    const errorMessage = [];
+    let errorMessage = '';
     const authType = {
       oAuth: false,
-      passwordBased: false,
+      basic: false,
       staticToken: false
     };
     // console.log(user);
     if (!Object.prototype.hasOwnProperty.call(user, 'hostname') || !user.hostname.length) {
-      errorMessage.push('For authentication, manadatory property \'hostname\' is missing');
-    }
-    if (Object.prototype.hasOwnProperty.call(user, 'client_id') || Object.prototype.hasOwnProperty.call(user, 'client_secret')
-    || Object.prototype.hasOwnProperty.call(user, 'grant_type')) {
-      if (Object.prototype.hasOwnProperty.call(user, 'client_id') && user.client_id.length
-      && Object.prototype.hasOwnProperty.call(user, 'client_secret') && user.client_secret.length
-      && Object.prototype.hasOwnProperty.call(user, 'grant_type') && user.grant_type.length) {
-        authType.oAuth = true;
-      } else errorMessage.push('For OAuth based authentication, manadatory properties \'client_id\' or \'client_secret\' or \'grant_type\' is missing');
-    } else if (Object.prototype.hasOwnProperty.call(user, 'token') && user.token.length) {
-      authType.staticToken = true;
-    } else if (Object.prototype.hasOwnProperty.call(user, 'username') || Object.prototype.hasOwnProperty.call(user, 'password')) {
-      if (Object.prototype.hasOwnProperty.call(user, 'username') && Object.prototype.hasOwnProperty.call(user, 'password')
-        && user.username.length && user.password.length) {
-        authType.passwordBased = true;
-      } else {
-        errorMessage.push('For Password based authentication, manadatory properties \'username\' or \'password\' is missing or for static token based authentication, \'token\' is missing');
-      }
+      errorMessage = 'For authentication, manadatory property \'hostname\' is missing';
     } else {
-      errorMessage.push('For authentication , manadatory properties \'token\' or \'client_id\' or \'username\' is missing');
+      if (Object.prototype.hasOwnProperty.call(user, 'token') && user.token.length) {
+        authType.staticToken = true;
+      } else if (Object.prototype.hasOwnProperty.call(user, 'username') && Object.prototype.hasOwnProperty.call(user, 'password')
+        && user.username.length && user.password.length) {
+        authType.basic = true;
+      } else if (Object.prototype.hasOwnProperty.call(user, 'client_id') && user.client_id.length
+        && Object.prototype.hasOwnProperty.call(user, 'client_secret') && user.client_secret.length
+        && Object.prototype.hasOwnProperty.call(user, 'grant_type') && user.grant_type.length) {
+        authType.oAuth = true;
+      }  else {
+        errorMessage = `For authentication, manadatory properties and values as per auth type is missing: static token type - \'token\'; basic type - \'username\' , \'password\'; OAuth2 type: \'client_id\' , \'client_secret\', \'grant_type\'`;
+      }
     }
-
+    
     if (errorMessage.length > 0) {
       // console.log(errorMessage);
       user.errorMessage = errorMessage;
@@ -10870,9 +11102,8 @@ class Authentication {
   }
 
   validateList(userList) {
-    const userError = [];
     const usersInitial = [];
-
+    
     userList.forEach((checkUser) => {
 
       if(!Object.prototype.hasOwnProperty.call(checkUser, 'validity') || checkUser.validity === false){
@@ -10918,6 +11149,7 @@ class Authentication {
 
 ;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/genericApi.js
 
+
 /**
  * Class that performs generic api requests to Itential services.
  */
@@ -10926,6 +11158,7 @@ class GenericAPI {
     this.user = user;
     this.baseURL = baseURL;
     this.auth = auth;
+    this.utils = new Utils();
   }
 
   /**
@@ -10943,15 +11176,18 @@ class GenericAPI {
       let token = '';
       await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
         if (error) {
+          error.IAPerror.origin = 'generic-genericRequest';
           return callback(null, error);
         }
         token = theToken;
       });
       if (method === null || hyperSchema === null || href === null) {
-        return callback(null, 'One or more method arguemnts are null');
+        const error = this.utils.formatErrorObject("generic-genericRequest", "Null Arguments", ["method", "hyperSchema", "href"], null, null, null);
+        return callback(null, error);
       }
       if (method === '' || hyperSchema === '' || href === '') {
-        return callback(null, 'One or more method arguments are empty');
+        const error = this.utils.formatErrorObject("generic-genericRequest", "Empty Arguments", ["method", "hyperSchema", "href"], null, null, null);
+        return callback(null, error);
       }
       let axiosRequest = {};
       if (method === 'POST' || method === 'DELETE' || method === 'PUT') {
@@ -10972,22 +11208,26 @@ class GenericAPI {
         const res = await lib_axios(axiosRequest);
         return callback(res, null);
       }
-      return callback(null, 'Invalid HTTP Method');
+      const error = this.utils.formatErrorObject("generic-genericReqiest", "Invalid HTTP Method", null, null, null, null);
+      return callback(null, error);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("generic-genericReqiest", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
   }
 }
-;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/jsonFormsApi.js
+;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/formsApi.js
+
 
 /**
  * Class that utilizes Itential's JSON Forms API to perform pipeline actions.
  */
-class JSONFormsAPI {
+class FormsAPI {
   constructor(baseURL, user, auth) {
     this.user = user;
     this.baseURL = baseURL;
     this.auth = auth;
+    this.utils = new Utils();
   }
 
   /**
@@ -10999,37 +11239,45 @@ class JSONFormsAPI {
    */
   async getForm(formId, callback) {
     try {
-      let token = '';
-      await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
+      let token_object = {};
+      await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
         if (error) {
+          error.IAPerror.origin = 'jsonForms-getForm';
           return callback(null, error);
         }
-        token = theToken;
+        token_object = token_obj;
       });
       if (formId === null) {
-        return callback(null, 'The form ID is null');
+        const error = this.utils.formatErrorObject("jsonForms-getForm", "Null Arguments", ["formId"], null, null, null);
+        return callback(null, error);
       }
       if (formId === '') {
-        return callback(null, 'The form ID is blank');
+        const error = this.utils.formatErrorObject("jsonForms-getForm", "Empty Arguments", ["formId"], null, null, null);
+        return callback(null, error);
       }
-      const getFormURL = `${this.baseURL}/json-forms/forms/${formId}?token=${token}`;
-      const trigger = await lib_axios.get(getFormURL);
+
+      const formatted_req = this.utils.formatAxiosRequest(this.baseURL,`/json-forms/forms/${formId}`, token_object);
+      const getFormURL = formatted_req.url;
+      const trigger = await lib_axios.get(getFormURL, formatted_req.config);
       return callback(trigger.data, null);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("jsonForms-getForm", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
   }
 }
-;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/operationsManagerApi.js
+;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/operationsApi.js
+
 
 /**
  * Class that utilizes Itential's Operations Manager API to perform pipeline actions.
  */
-class OperationsManagerAPI {
+class OperationsAPI {
   constructor(baseURL, user, auth) {
     this.user = user;
     this.baseURL = baseURL;
     this.auth = auth;
+    this.utils = new Utils();
   }
 
   /**
@@ -11041,16 +11289,19 @@ class OperationsManagerAPI {
   */
   getAutomationMetrics(id, callback) {
     if (id === null) {
-      return callback(null, 'Automation ID is Null');
+      const error = this.utils.formatErrorObject("operationsManager-getAutomationMetrics", "Null Arguments", ["id"], null, null, null);
+      return callback(null, error);
     }
     this.getAutomationResult(id, (automation, fail) => {
       if (fail) {
+        fail.IAPerror.origin = 'operationsManager-getAutomationMetrics';
         return callback(null, fail);
       }
       if (automation.status === 'complete' || automation.status === 'canceled' || automation.status === 'error') {
         return callback(automation.metrics, null);
       }
-      return callback(null, `Automation is not finished! Automation State: ${automation.status}`);
+      const error = this.utils.formatErrorObject("operationsManager-getAutomationMetrics", "Unfinished Automation", [id, automation.status], null, null, null);
+      return callback(null, error);
     });
   }
 
@@ -11063,21 +11314,26 @@ class OperationsManagerAPI {
    */
   async getAutomationResult(id, callback) {
     try {
-      let token = '';
-      await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
+      let token_object = {};
+      await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
         if (error) {
+          error.IAPerror.origin = 'operationsManager-getAutomationResult';
           return callback(null, error);
         }
-        token = theToken;
+        token_object = token_obj;
       });
       if (id === null) {
-        return callback(null, 'Automation ID is Null');
+        const error = this.utils.formatErrorObject("operationsManager-getAutomationResult", "Null Arguments", ["id"], null, null, null);
+        return callback(null, error);
       }
-      const url = `${this.baseURL}/operations-manager/jobs/${id}?token=${token}`;
-      const res = await lib_axios.get(url);
+
+      const formatted_req = this.utils.formatAxiosRequest(this.baseURL,`/operations-manager/jobs/${id}`, token_object);
+      const url = formatted_req.url;
+      const res = await lib_axios.get(url, formatted_req.config);
       return callback(res.data.data, null);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("operationsManager-getAutomationResult", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
   }
 
@@ -11090,10 +11346,12 @@ class OperationsManagerAPI {
    */
   getAutomationStatus(id, callback) {
     if (id === null) {
-      return callback(null, 'Automation ID is null');
+      const error = this.utils.formatErrorObject("operationsManager-getAutomationStatus", "Null Arguments", ["id"], null, null, null);
+      return callback(null, error);
     }
     this.getAutomationResult(id, (automation, fail) => {
       if (fail) {
+        fail.IAPerror.origin = 'operationsManager-getAutomationStatus';
         return callback(null, fail);
       }
       return callback(automation.status, null);
@@ -11109,23 +11367,30 @@ class OperationsManagerAPI {
    */
   async cancelAutomations(ids, callback) {
     try {
-      let token = '';
-      await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
+      let token_object = {};
+      await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
         if (error) {
+          error.IAPerror.origin = 'operationsManager-cancelAutomations';
           return callback(null, error);
         }
-        token = theToken;
+        token_object = token_obj;
       });
-      if (ids === null || ids.length === 0) {
-        return callback(null, 'Array of ids is null or empty');
+      if (ids === null) {
+        const error = this.utils.formatErrorObject("operationsManager-cancelAutomations", "Null Arguments", ["ids"], null, null, null);
+        return callback(null, error);
+      } else if(ids.length === 0){
+        const error = this.utils.formatErrorObject("operationsManager-cancelAutomations", "Empty Arguments", ["ids"], null, null, null);
+        return callback(null, error);
       }
       if (typeof ids === 'string') {
         const tempString = ids;
         ids = [];
         ids.push(tempString);
       }
-      const url = `${this.baseURL}/operations-manager/jobs/cancel?token=${token}`;
-      const res = await lib_axios.post(url, { jobIds: ids });
+
+      const formatted_req = this.utils.formatAxiosRequest(this.baseURL,`/operations-manager/jobs/cancel`, token_object);
+      const url = formatted_req.url;
+      const res = await lib_axios.post(url, { jobIds: ids }, formatted_req.config);
       return callback(res.data.message, null);
     } catch (err) {
       if (err.response.status === 500 && err.response.data.message === 'Failed to cancel all jobs') {
@@ -11137,7 +11402,8 @@ class OperationsManagerAPI {
         }
         return callback(message, null);
       }
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("operationsManager-cancelAutomations", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
   }
 
@@ -11151,18 +11417,21 @@ class OperationsManagerAPI {
     try {
       let automations = [];
       let triggers = [];
-      let token = '';
-      await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
+      let token_object = {};
+      await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
         if (error) {
+          error.IAPerror.origin = 'operationsManager-listAutomations';
           return callback(null, error);
         }
-        token = theToken;
+        token_object = token_obj;
       });
-      const getAutomationsUrl = `${this.baseURL}/operations-manager/automations?token=${token}`;
-      const getTriggersUrl = `${this.baseURL}/operations-manager/triggers?token=${token}`;
-      const res = await lib_axios.get(getAutomationsUrl);
+      const formatted_req_auto = this.utils.formatAxiosRequest(this.baseURL,`/operations-manager/automations`, token_object);
+      const getAutomationsUrl = `${formatted_req_auto.url}&limit=1000&order=1&skip=0&sort=name`;
+      const res = await lib_axios.get(getAutomationsUrl, formatted_req_auto.config);
       automations = res.data.data;
-      const res2 = await lib_axios.get(getTriggersUrl);
+      const formatted_req_tr = this.utils.formatAxiosRequest(this.baseURL,`/operations-manager/triggers`, token_object);
+      const getTriggersUrl = `${formatted_req_tr.url}&skip=0&limit=1000`;
+      const res2 = await lib_axios.get(getTriggersUrl, formatted_req_tr.config);
       triggers = res2.data.data;
       // Make an empty map for automation id mapped the index it's found
       const automationMap = new Map();
@@ -11184,7 +11453,8 @@ class OperationsManagerAPI {
       }
       return callback(automations, null);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("operationsManager-listAutomations", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
   }
 
@@ -11198,22 +11468,26 @@ class OperationsManagerAPI {
    */
   async startAutomation(automationName, triggerName, callback, formData = {}) {
     try {
-      let token = '';
-      await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
+      let token_object = {};
+      await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
         if (error) {
+          error.IAPerror.origin = 'operationsManager-startAutomation';
           return callback(null, error);
         }
-        token = theToken;
+        token_object = token_obj;
       });
       if (automationName === null || triggerName === null) {
-        return callback(null, 'One or more inputs are null');
+        const error = this.utils.formatErrorObject("operationsManager-startAutomation", "Null Arguments", ["automationName", "triggerName"], null, null, null);
+        return callback(null, error);
       }
       if (automationName === '' || triggerName === '') {
-        return callback(null, 'One or more inputs are empty');
+        const error = this.utils.formatErrorObject("operationsManager-startAutomation", "Empty Arguments", ["automationName", "triggerName"], null, null, null);
+        return callback(null, error);
       }
       let automationsWithTriggers = [];
       await this.listAutomations((automations, error) => {
         if (error) {
+          error.IAPerror.origin = 'operationsManager-startAutomation';
           return callback(null, error);
         }
         automationsWithTriggers = automations;
@@ -11224,17 +11498,21 @@ class OperationsManagerAPI {
           for (let y = 0; y < triggers.length; y++) {
             if (triggers[y].name === triggerName) {
               const triggerId = triggers[y]._id;
-              const startautomationUrl = `${this.baseURL}/operations-manager/triggers/manual/${triggerId}/run?token=${token}`;
-              const res = await lib_axios.post(startautomationUrl, {formData});
+              const formatted_req = this.utils.formatAxiosRequest(this.baseURL,`/operations-manager/triggers/manual/${triggerId}/run`, token_object);
+              const startautomationUrl = formatted_req.url;
+              const res = await lib_axios.post(startautomationUrl, {formData}, formatted_req.config);
               return callback(res.data, null);
             }
           }
-          return callback(null, 'Can\'t find specified trigger');
+          const error = this.utils.formatErrorObject("operationsManager-startAutomation", "Can't Find Trigger", [triggerName, automationName], null, null, null);
+          return callback(null, error);
         }
       }
-      return callback(null, 'Can\'t find specified automation');
+      const error = this.utils.formatErrorObject("operationsManager-startAutomation", "Can't Find Automation", [automationName], null, null, null);
+      return callback(null, error);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("operationsManager-startAutomation", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
   }
 
@@ -11248,25 +11526,34 @@ class OperationsManagerAPI {
   async startAutomationEndpoint(apiEndpoint, apiEndpointBody = {}, callback) {
 
     try {
-      let token = '';
-      await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
+      let token_object = {};
+      await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
         if (error) {
+          error.IAPerror.origin = 'operationsManager-startAutomationEndpoint';
           return callback(null, error);
         }
-        token = theToken;
+        token_object = token_obj;
       });
+
+      if(apiEndpoint === null){
+        const error = this.utils.formatErrorObject("operationsManager-startAutomationEndpoint", "Null Arguments", ["apiEndpoint"], null, null, null);
+        return callback(null, error);
+      } else if(apiEndpoint === ''){
+        const error = this.utils.formatErrorObject("operationsManager-startAutomationEndpoint", "Empty Arguments", ["apiEndpoint"], null, null, null);
+        return callback(null, error);
+      }
 
       //handling input by user
       if (apiEndpoint.startsWith('/')){
         apiEndpoint= apiEndpoint.substring(1);
       }
-      
-      const url = `${this.baseURL}/operations-manager/triggers/endpoint/${apiEndpoint}?token=${token}`;
-      const res = await lib_axios.post(url, apiEndpointBody);
+      const formatted_req = this.utils.formatAxiosRequest(this.baseURL,`/operations-manager/triggers/endpoint/${apiEndpoint}`, token_object);
+      const url = formatted_req.url;
+      const res = await lib_axios.post(url, apiEndpointBody, formatted_req.config);
       return callback(res.data, null);
-      
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("operationsManager-startAutomationEndpoint", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
 
   }
@@ -11274,6 +11561,7 @@ class OperationsManagerAPI {
 }
 
 ;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/transformationsAPI.js
+
 
 /**
  * Class that utilizes Itential's Transformations API to perform pipeline actions.
@@ -11283,6 +11571,7 @@ class TransformationsAPI {
     this.user = user;
     this.baseURL = baseURL;
     this.auth = auth;
+    this.utils = new Utils();
   }
 
   /**
@@ -11294,25 +11583,31 @@ class TransformationsAPI {
    */
   async runTransformation(id, incoming, callback) {
     try {
-      let token = '';
-      await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
+      let token_object = {};
+      await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
         if (error) {
+          error.IAPerror.origin = 'transformations-getToken';
           return callback(null, error);
         }
-        token = theToken;
+        token_object = token_obj;
       });
       if (id === null || incoming === null) {
-        return callback(null, 'One or more method arguemnts are null');
+        const error = this.utils.formatErrorObject("transformations-runTransformation", "Null Arguments", ["id", "incoming"], null, null, null);
+        return callback(null, error);
       }
-      const transformationURL = `${this.baseURL}/transformations/${id}?token=${token}`;
-      const res = await lib_axios.post(transformationURL, incoming);
+
+      const formatted_req = this.utils.formatAxiosRequest(this.baseURL,`/transformations/${id}`, token_object);
+      const transformationURL = formatted_req.url;
+      const res = await lib_axios.post(transformationURL, incoming, formatted_req.config);
       return callback(res, null);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("transformations-runTransformation", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
   }
 }
 ;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/healthApi.js
+
 
 /**
  * Class that utilizes Itential's API to obtain the Health status.
@@ -11323,6 +11618,7 @@ class HealthAPI {
         this.user = user;
         this.baseURL = baseURL;
         this.auth = auth;
+        this.utils = new Utils();
     }
 
    /**
@@ -11333,20 +11629,22 @@ class HealthAPI {
 
     async getServerHealth(callback){
         try {
-            let token = '';
-            await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
+            let token_object = {};
+            await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
                 if (error) {
+                    error.IAPerror.origin = 'health-getServerHealth';
                     return callback(null, error);
                 }
-                token = theToken;
+                token_object = token_obj;
             });
 
-            const url = `${this.baseURL}/health/server?token=${token}`;
-            const res = await lib_axios.get(url);
+            const formatted_req = this.utils.formatAxiosRequest(this.baseURL,'/health/server', token_object);
+            const url = formatted_req.url;
+            const res = await lib_axios.get(url, formatted_req.config);
             return callback(res.data, null);
-            
         } catch (err) {
-            return callback(null, err);
+            const error = this.utils.formatErrorObject("health-getServerHealth", "Axios Error", null, null, null, err);
+            return callback(null, error);
         }
        
     }
@@ -11362,48 +11660,79 @@ class HealthAPI {
 
 
 
-const ItentialSDK = { Authentication: Authentication, GenericAPI: GenericAPI, JSONFormsAPI: JSONFormsAPI, OperationsManagerAPI: OperationsManagerAPI, TransformationsAPI: TransformationsAPI, HealthAPI: HealthAPI}
+const ItentialSDK = { Authentication: Authentication, GenericAPI: GenericAPI, FormsAPI: FormsAPI, OperationsAPI: OperationsAPI, TransformationsAPI: TransformationsAPI, HealthAPI: HealthAPI}
 ;// CONCATENATED MODULE: ./src/action.js
 
 
 
 
 async function run() {
-  
-  const iap_token = (0,core.getInput)("iap_token");
+
+  // testing code 
+  /*const auth_token = "";//'YjcwMTMwNmI1MDFiMzAzNTJjOWFiNzg2YTYxNjJkYTU=';
+  const auth_username = "";//getInput("auth_username");
+  const auth_password = "";//getInput("auth_password");
+  const auth_client_id = "6489e83007ef9200071b3982";
+  const auth_client_secret = "0cbd84b9-fd66-4535-aa34-52c5a57c2695";
+  const auth_grant_type = "client_credentials";
+  const api_endpoint_body = {"time": "15", "endtime": "45"};
+  const time_interval = "3";
+  const no_of_attempts = "20";
+  const automation_status = "1";
+  let itential_host_url = "https://automation-platform-20231.latest.uat.itential.io/";//'https://itential-se-poc-stg-221.trial.itential.io';//"https://automation-platform-20231.latest.uat.itential.io/"; ; 
+  if (itential_host_url.endsWith('/'))
+    itential_host_url = itential_host_url.substring(0, itential_host_url.length - 1);
+  let api_endpoint = "test_route";
+  if (api_endpoint.startsWith('/'))
+    api_endpoint = api_endpoint.substring(1);
+  */
+
+  const auth_token = (0,core.getInput)("auth_token");
+  const auth_username = (0,core.getInput)("auth_username");
+  const auth_password = (0,core.getInput)("auth_password");
+  const auth_client_id = (0,core.getInput)("auth_client_id");
+  const auth_client_secret = (0,core.getInput)("auth_client_secret");
+  const auth_grant_type = (0,core.getInput)("auth_grant_type");
   const api_endpoint_body = JSON.parse((0,core.getInput)("api_endpoint_body"));
   const time_interval = (0,core.getInput)("time_interval");
   const no_of_attempts = (0,core.getInput)("no_of_attempts");
   const automation_status = (0,core.getInput)("automation_status");
-  let iap_instance = (0,core.getInput)("iap_instance");
-  if (iap_instance.endsWith('/'))
-    iap_instance = iap_instance.substring(0, iap_instance.length - 1);
+  let itential_host_url = (0,core.getInput)("itential_host_url");
+  if (itential_host_url.endsWith('/'))
+    itential_host_url = itential_host_url.substring(0, itential_host_url.length - 1);
   let api_endpoint = (0,core.getInput)("api_endpoint");
   if (api_endpoint.startsWith('/'))
     api_endpoint = api_endpoint.substring(1);
-  
+
   let count = 0;
 
-   //using the ea-utils library
+  //using the ea-utils library
    const user = [
     {
-      hostname: iap_instance,
-      username: '',
-      password: '',
-      token: iap_token
+      hostname: itential_host_url,
+      username: auth_username,
+      password: auth_password,
+      client_id: auth_client_id,
+      client_secret: auth_client_secret,
+      grant_type: auth_grant_type,
+      token: auth_token
     }
   ]
 
   const authentication = new ItentialSDK.Authentication(user); 
-  const opsManager = new ItentialSDK.OperationsManagerAPI(authentication.users[0].hostname, authentication.users[0].userKey, authentication);
+  const opsApi = new ItentialSDK.OperationsAPI(authentication.users[0].hostname, authentication.users[0].userKey, authentication);
   const health = new ItentialSDK.HealthAPI(authentication.users[0].hostname, authentication.users[0].userKey, authentication);
-  
+  const message = "An Itential account is required to get credentials needed to configure the Github Actions." + 
+  "In order to utilize this action, you would need to have an active \`Itential Automation Platform\` (IAP)." + 
+  "If you are an existing customer, please contact your Itential account team for additional details." + 
+  "For new customers interested in an Itential trial, please click [here](https://www.itential.com/get-started/) to request one."
+
   try {
     //check the status of the automation and return the output (IAP release <= 2021.1)
     const automationStatus211 = (automation_id) => {
       lib_axios.get(
-        `${iap_instance}/workflow_engine/job/${automation_id}/details?token=` +
-        iap_token
+        `${itential_host_url}/workflow_engine/job/${automation_id}/details?token=` +
+        authentication.users[0].token
       )
         .then((res) => {
           console.log("Automation Status: ", res.data.status);
@@ -11414,8 +11743,8 @@ async function run() {
             }, time_interval * 1000);
           } else if (res.data.status === "complete") {
             lib_axios.get(
-              `${iap_instance}/workflow_engine/job/${automation_id}/output?token=` +
-              iap_token
+              `${itential_host_url}/workflow_engine/job/${automation_id}/output?token=` +
+              authentication.users[0].token
             )
               .then((res) => {
                 (0,core.setOutput)("results", res.data.variables); 
@@ -11441,17 +11770,12 @@ async function run() {
     //check the status of the automation and return the output (IAP release > 2021.1)
     const automationStatus221 = (automation_id) => {
 
-      opsManager.getAutomationResult(automation_id, (res,err) => {
+      opsApi.getAutomationResult(automation_id, (res,err) => {
         if (err){
-          if (typeof err === "string") {
-            (0,core.setFailed)(err);
-          } else if(typeof err.response === "object") {
-            (0,core.setFailed)(err.response.data);
-          } else (0,core.setFailed)(`Failed while getting automation result: Please check the instance configuration and credentials
-          An Itential account is required to get credentials needed to configure the Github Actions.
-          In order to utilize this action, you would need to have an active \`Itential Automation Platform\` (IAP).
-          If you are an existing customer, please contact your Itential account team for additional details.
-          For new customers interested in an Itential trial, please click [here](https://www.itential.com/get-started/) to request one.`);
+          if(typeof err.IAPerror.stack === "object" && typeof err.IAPerror.stack.response === "object" ) {
+            (0,core.setFailed)("origin:" + err.IAPerror.origin + ";" + err.IAPerror.stack.response.data);
+
+          } else (0,core.setFailed)("Failed while getting automation result: " + message);
 
         } else {
           console.log("Automation Status: ", res.status);
@@ -11483,17 +11807,11 @@ async function run() {
       health.getServerHealth((res, err)=> {
 
         if(err){
-          if(typeof err === "string"){
-            (0,core.setFailed)(err);
 
-          } else if(typeof err.response === "object") {
-            (0,core.setFailed)(err.response.data);
+          if(typeof err.IAPerror.stack === "object" && typeof err.IAPerror.stack.response === "object" ) {
+            (0,core.setFailed)("origin:" + err.IAPerror.origin + ";" + err.IAPerror.stack.response.data);
 
-          } else (0,core.setFailed)(`Failed while checking server health: Please check the instance configuration and credentials
-            An Itential account is required to get credentials needed to configure the Github Actions.
-            In order to utilize this action, you would need to have an active \`Itential Automation Platform\` (IAP).
-            If you are an existing customer, please contact your Itential account team for additional details.
-            For new customers interested in an Itential trial, please click [here](https://www.itential.com/get-started/) to request one.`);
+          } else (0,core.setFailed)("Failed while server health check: " + message);
 
         } else {
 
@@ -11502,18 +11820,20 @@ async function run() {
             res.release.lastIndexOf(".")
           );
 
-          opsManager.startAutomationEndpoint(api_endpoint, api_endpoint_body, (res, err)=> {
+          opsApi.startAutomationEndpoint(api_endpoint, api_endpoint_body, (res, err)=> {
 
             if(err){
-              if(typeof err === "string"){
-                (0,core.setFailed)(err);
-              } else if(typeof err.response === "object") {
-                (0,core.setFailed)(err.response.data);
-              } else (0,core.setFailed)(`Failed while starting automation: Please check the instance configuration and credentials
-                An Itential account is required to get credentials needed to configure the Github Actions.
-                In order to utilize this action, you would need to have an active \`Itential Automation Platform\` (IAP).
-                If you are an existing customer, please contact your Itential account team for additional details.
-                For new customers interested in an Itential trial, please click [here](https://www.itential.com/get-started/) to request one.`);
+              
+             if(typeof err.IAPerror.stack === "object" && typeof err.IAPerror.stack.response === "object" ) {
+                if(typeof err.IAPerror.stack.response.data === "object"){
+                  (0,core.setFailed)("origin:" + err.IAPerror.origin + ";" + err.IAPerror.stack.response.data.message);
+                }
+                
+                else{
+                  (0,core.setFailed)("origin:" + err.IAPerror.origin + ";" + err.IAPerror.stack.response.data);
+                }
+                
+              } else (0,core.setFailed)("Failed while starting automation: " + message);
             }else {
               if (Boolean(Number(automation_status)) === true) {
                 if (Number(release) <= 2021.1) automationStatus211(res._id);
