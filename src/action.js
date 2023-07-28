@@ -3,8 +3,6 @@ import axios from 'axios'
 import { ItentialSDK } from "ea-utils/sdk.js";
 
 async function run() {
-
-
   const auth_token = getInput("auth_token");
   const auth_username = getInput("auth_username");
   const auth_password = getInput("auth_password");

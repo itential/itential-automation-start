@@ -9,10 +9,11 @@ A Github action that will start Itential automations.
 - [Getting Started](#getting-started)
 - [Configurations](#configurations)
   - [Required Input Parameters](#required-input-parameters)
-  - [Required Input Parameters for Authentication](#required-input-parameters-for-authentication)
+  - [Required Authentication Parameters](#required-authentication-parameters)
   - [Optional Input Parameters](#optional-input-parameters)
   - [Output](#output)
 - [Example Usage](#example-usage)
+- [Troubleshhoting]
 
 ## Prerequisites
 
@@ -55,6 +56,7 @@ _For more information about Github Actions variables, see [variables](https://do
 [action.yml](action.yml) file defines the metadata for this action.
 
 _For more information about metadata, see [metadata](https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions)._
+_For more information about connecting to private network, see (https://docs.github.com/en/actions/using-github-hosted-runners/connecting-to-a-private-network)_
 
 ### Required Input Parameters
 
@@ -66,7 +68,7 @@ The following table defines the required input parameters to run an Itential aut
 | api_endpoint      | API endpoint name to start an automation.        |
 | api_endpoint_body | The POST body used to create the workflow input. |
 
-#### Required Authentication Parameters
+### Required Authentication Parameters
 
 There are three methods for authenticating API requests to the Itential instance.The following tables describe the required parameters for each authentication method.Based on the available credentials input the appropriate parameters. By default, all the authentication parameters are set to empty string.
 
