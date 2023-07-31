@@ -1,16 +1,28 @@
 name: 'itential-automation-start'
-description: 'Action to Start Itential Automation Platform(IAP) automations'
+description: 'Action to Start Itential Automations'
 author: 'Itential'
 branding:
   icon: 'activity'
   color: 'blue'
 inputs:
-  iap_instance:
-    description: 'Itential Automation Platform instance url'
+  itential_host_url:
+    description: 'Itential instance url'
     required: true
-  iap_token:
-    description: 'Token required to access IAP instance'
-    required: true
+  auth_token:
+    description: 'Token is required, if using static token authentication to access Itential instance'
+    default: ''
+  auth_username:
+    description: 'Username is required, if using basic token authentication to access Itential instance'
+    default: ''
+  auth_password:
+    description: 'Password is required, if using basic token authentication to access Itential instance'
+    default: ''
+  auth_client_id:
+    description: 'Client ID is required, if using OAuth2 client credentials authentication to access Itential instance'
+    default: ''
+  auth_client_secret:
+    description: 'Client Secret is required, if using OAuth2 client credentials authentication to access Itential instance'
+    default: ''
   api_endpoint:
     description: 'API endpoint name to start an automation'
     required: true

@@ -6751,7 +6751,7 @@ const isAsyncFn = kindOfTest('AsyncFunction');
 const isThenable = (thing) =>
   thing && (isObject(thing) || isFunction(thing)) && isFunction(thing.then) && isFunction(thing.catch);
 
-/* harmony default export */ const utils = ({
+/* harmony default export */ const lib_utils = ({
   isArray,
   isArrayBuffer,
   isBuffer,
@@ -6838,7 +6838,7 @@ function AxiosError(message, code, config, request, response) {
   response && (this.response = response);
 }
 
-utils.inherits(AxiosError, Error, {
+lib_utils.inherits(AxiosError, Error, {
   toJSON: function toJSON() {
     return {
       // Standard
@@ -6853,7 +6853,7 @@ utils.inherits(AxiosError, Error, {
       columnNumber: this.columnNumber,
       stack: this.stack,
       // Axios
-      config: utils.toJSONObject(this.config),
+      config: lib_utils.toJSONObject(this.config),
       code: this.code,
       status: this.response && this.response.status ? this.response.status : null
     };
@@ -6888,7 +6888,7 @@ Object.defineProperty(AxiosError_prototype, 'isAxiosError', {value: true});
 AxiosError.from = (error, code, config, request, response, customProps) => {
   const axiosError = Object.create(AxiosError_prototype);
 
-  utils.toFlatObject(error, axiosError, function filter(obj) {
+  lib_utils.toFlatObject(error, axiosError, function filter(obj) {
     return obj !== Error.prototype;
   }, prop => {
     return prop !== 'isAxiosError';
@@ -6930,7 +6930,7 @@ var form_data = __nccwpck_require__(4334);
  * @returns {boolean}
  */
 function isVisitable(thing) {
-  return utils.isPlainObject(thing) || utils.isArray(thing);
+  return lib_utils.isPlainObject(thing) || lib_utils.isArray(thing);
 }
 
 /**
@@ -6941,7 +6941,7 @@ function isVisitable(thing) {
  * @returns {string} the key without the brackets.
  */
 function removeBrackets(key) {
-  return utils.endsWith(key, '[]') ? key.slice(0, -2) : key;
+  return lib_utils.endsWith(key, '[]') ? key.slice(0, -2) : key;
 }
 
 /**
@@ -6970,10 +6970,10 @@ function renderKey(path, key, dots) {
  * @returns {boolean}
  */
 function isFlatArray(arr) {
-  return utils.isArray(arr) && !arr.some(isVisitable);
+  return lib_utils.isArray(arr) && !arr.some(isVisitable);
 }
 
-const predicates = utils.toFlatObject(utils, {}, null, function filter(prop) {
+const predicates = lib_utils.toFlatObject(lib_utils, {}, null, function filter(prop) {
   return /^is[A-Z]/.test(prop);
 });
 
@@ -7001,7 +7001,7 @@ const predicates = utils.toFlatObject(utils, {}, null, function filter(prop) {
  * @returns
  */
 function toFormData(obj, formData, options) {
-  if (!utils.isObject(obj)) {
+  if (!lib_utils.isObject(obj)) {
     throw new TypeError('target must be an object');
   }
 
@@ -7009,13 +7009,13 @@ function toFormData(obj, formData, options) {
   formData = formData || new (classes_FormData || FormData)();
 
   // eslint-disable-next-line no-param-reassign
-  options = utils.toFlatObject(options, {
+  options = lib_utils.toFlatObject(options, {
     metaTokens: true,
     dots: false,
     indexes: false
   }, false, function defined(option, source) {
     // eslint-disable-next-line no-eq-null,eqeqeq
-    return !utils.isUndefined(source[option]);
+    return !lib_utils.isUndefined(source[option]);
   });
 
   const metaTokens = options.metaTokens;
@@ -7024,24 +7024,24 @@ function toFormData(obj, formData, options) {
   const dots = options.dots;
   const indexes = options.indexes;
   const _Blob = options.Blob || typeof Blob !== 'undefined' && Blob;
-  const useBlob = _Blob && utils.isSpecCompliantForm(formData);
+  const useBlob = _Blob && lib_utils.isSpecCompliantForm(formData);
 
-  if (!utils.isFunction(visitor)) {
+  if (!lib_utils.isFunction(visitor)) {
     throw new TypeError('visitor must be a function');
   }
 
   function convertValue(value) {
     if (value === null) return '';
 
-    if (utils.isDate(value)) {
+    if (lib_utils.isDate(value)) {
       return value.toISOString();
     }
 
-    if (!useBlob && utils.isBlob(value)) {
+    if (!useBlob && lib_utils.isBlob(value)) {
       throw new core_AxiosError('Blob is not supported. Use a Buffer instead.');
     }
 
-    if (utils.isArrayBuffer(value) || utils.isTypedArray(value)) {
+    if (lib_utils.isArrayBuffer(value) || lib_utils.isTypedArray(value)) {
       return useBlob && typeof Blob === 'function' ? new Blob([value]) : Buffer.from(value);
     }
 
@@ -7062,20 +7062,20 @@ function toFormData(obj, formData, options) {
     let arr = value;
 
     if (value && !path && typeof value === 'object') {
-      if (utils.endsWith(key, '{}')) {
+      if (lib_utils.endsWith(key, '{}')) {
         // eslint-disable-next-line no-param-reassign
         key = metaTokens ? key : key.slice(0, -2);
         // eslint-disable-next-line no-param-reassign
         value = JSON.stringify(value);
       } else if (
-        (utils.isArray(value) && isFlatArray(value)) ||
-        ((utils.isFileList(value) || utils.endsWith(key, '[]')) && (arr = utils.toArray(value))
+        (lib_utils.isArray(value) && isFlatArray(value)) ||
+        ((lib_utils.isFileList(value) || lib_utils.endsWith(key, '[]')) && (arr = lib_utils.toArray(value))
         )) {
         // eslint-disable-next-line no-param-reassign
         key = removeBrackets(key);
 
         arr.forEach(function each(el, index) {
-          !(utils.isUndefined(el) || el === null) && formData.append(
+          !(lib_utils.isUndefined(el) || el === null) && formData.append(
             // eslint-disable-next-line no-nested-ternary
             indexes === true ? renderKey([key], index, dots) : (indexes === null ? key : key + '[]'),
             convertValue(el)
@@ -7103,7 +7103,7 @@ function toFormData(obj, formData, options) {
   });
 
   function build(value, path) {
-    if (utils.isUndefined(value)) return;
+    if (lib_utils.isUndefined(value)) return;
 
     if (stack.indexOf(value) !== -1) {
       throw Error('Circular reference detected in ' + path.join('.'));
@@ -7111,9 +7111,9 @@ function toFormData(obj, formData, options) {
 
     stack.push(value);
 
-    utils.forEach(value, function each(el, key) {
-      const result = !(utils.isUndefined(el) || el === null) && visitor.call(
-        formData, el, utils.isString(key) ? key.trim() : key, path, exposedHelpers
+    lib_utils.forEach(value, function each(el, key) {
+      const result = !(lib_utils.isUndefined(el) || el === null) && visitor.call(
+        formData, el, lib_utils.isString(key) ? key.trim() : key, path, exposedHelpers
       );
 
       if (result === true) {
@@ -7124,7 +7124,7 @@ function toFormData(obj, formData, options) {
     stack.pop();
   }
 
-  if (!utils.isObject(obj)) {
+  if (!lib_utils.isObject(obj)) {
     throw new TypeError('data must be an object');
   }
 
@@ -7243,7 +7243,7 @@ function buildURL(url, params, options) {
   if (serializeFn) {
     serializedParams = serializeFn(params, options);
   } else {
-    serializedParams = utils.isURLSearchParams(params) ?
+    serializedParams = lib_utils.isURLSearchParams(params) ?
       params.toString() :
       new helpers_AxiosURLSearchParams(params, options).toString(_encode);
   }
@@ -7323,7 +7323,7 @@ class InterceptorManager {
    * @returns {void}
    */
   forEach(fn) {
-    utils.forEach(this.handlers, function forEachHandler(h) {
+    lib_utils.forEach(this.handlers, function forEachHandler(h) {
       if (h !== null) {
         fn(h);
       }
@@ -7374,7 +7374,7 @@ var external_url_ = __nccwpck_require__(7310);
 function toURLEncodedForm(data, options) {
   return helpers_toFormData(data, new node.classes.URLSearchParams(), Object.assign({
     visitor: function(value, key, path, helpers) {
-      if (node.isNode && utils.isBuffer(value)) {
+      if (node.isNode && lib_utils.isBuffer(value)) {
         this.append(key, value.toString('base64'));
         return false;
       }
@@ -7401,7 +7401,7 @@ function parsePropPath(name) {
   // foo.x.y.z
   // foo-x-y-z
   // foo x y z
-  return utils.matchAll(/\w+|\[(\w*)]/g, name).map(match => {
+  return lib_utils.matchAll(/\w+|\[(\w*)]/g, name).map(match => {
     return match[0] === '[]' ? '' : match[1] || match[0];
   });
 }
@@ -7438,10 +7438,10 @@ function formDataToJSON(formData) {
     let name = path[index++];
     const isNumericKey = Number.isFinite(+name);
     const isLast = index >= path.length;
-    name = !name && utils.isArray(target) ? target.length : name;
+    name = !name && lib_utils.isArray(target) ? target.length : name;
 
     if (isLast) {
-      if (utils.hasOwnProp(target, name)) {
+      if (lib_utils.hasOwnProp(target, name)) {
         target[name] = [target[name], value];
       } else {
         target[name] = value;
@@ -7450,23 +7450,23 @@ function formDataToJSON(formData) {
       return !isNumericKey;
     }
 
-    if (!target[name] || !utils.isObject(target[name])) {
+    if (!target[name] || !lib_utils.isObject(target[name])) {
       target[name] = [];
     }
 
     const result = buildPath(path, value, target[name], index);
 
-    if (result && utils.isArray(target[name])) {
+    if (result && lib_utils.isArray(target[name])) {
       target[name] = arrayToObject(target[name]);
     }
 
     return !isNumericKey;
   }
 
-  if (utils.isFormData(formData) && utils.isFunction(formData.entries)) {
+  if (lib_utils.isFormData(formData) && lib_utils.isFunction(formData.entries)) {
     const obj = {};
 
-    utils.forEachEntry(formData, (name, value) => {
+    lib_utils.forEachEntry(formData, (name, value) => {
       buildPath(parsePropPath(name), value, obj, 0);
     });
 
@@ -7504,10 +7504,10 @@ const DEFAULT_CONTENT_TYPE = {
  * @returns {string} A stringified version of the rawValue.
  */
 function stringifySafely(rawValue, parser, encoder) {
-  if (utils.isString(rawValue)) {
+  if (lib_utils.isString(rawValue)) {
     try {
       (parser || JSON.parse)(rawValue);
-      return utils.trim(rawValue);
+      return lib_utils.trim(rawValue);
     } catch (e) {
       if (e.name !== 'SyntaxError') {
         throw e;
@@ -7527,13 +7527,13 @@ const defaults = {
   transformRequest: [function transformRequest(data, headers) {
     const contentType = headers.getContentType() || '';
     const hasJSONContentType = contentType.indexOf('application/json') > -1;
-    const isObjectPayload = utils.isObject(data);
+    const isObjectPayload = lib_utils.isObject(data);
 
-    if (isObjectPayload && utils.isHTMLForm(data)) {
+    if (isObjectPayload && lib_utils.isHTMLForm(data)) {
       data = new FormData(data);
     }
 
-    const isFormData = utils.isFormData(data);
+    const isFormData = lib_utils.isFormData(data);
 
     if (isFormData) {
       if (!hasJSONContentType) {
@@ -7542,18 +7542,18 @@ const defaults = {
       return hasJSONContentType ? JSON.stringify(helpers_formDataToJSON(data)) : data;
     }
 
-    if (utils.isArrayBuffer(data) ||
-      utils.isBuffer(data) ||
-      utils.isStream(data) ||
-      utils.isFile(data) ||
-      utils.isBlob(data)
+    if (lib_utils.isArrayBuffer(data) ||
+      lib_utils.isBuffer(data) ||
+      lib_utils.isStream(data) ||
+      lib_utils.isFile(data) ||
+      lib_utils.isBlob(data)
     ) {
       return data;
     }
-    if (utils.isArrayBufferView(data)) {
+    if (lib_utils.isArrayBufferView(data)) {
       return data.buffer;
     }
-    if (utils.isURLSearchParams(data)) {
+    if (lib_utils.isURLSearchParams(data)) {
       headers.setContentType('application/x-www-form-urlencoded;charset=utf-8', false);
       return data.toString();
     }
@@ -7565,7 +7565,7 @@ const defaults = {
         return toURLEncodedForm(data, this.formSerializer).toString();
       }
 
-      if ((isFileList = utils.isFileList(data)) || contentType.indexOf('multipart/form-data') > -1) {
+      if ((isFileList = lib_utils.isFileList(data)) || contentType.indexOf('multipart/form-data') > -1) {
         const _FormData = this.env && this.env.FormData;
 
         return helpers_toFormData(
@@ -7589,7 +7589,7 @@ const defaults = {
     const forcedJSONParsing = transitional && transitional.forcedJSONParsing;
     const JSONRequested = this.responseType === 'json';
 
-    if (data && utils.isString(data) && ((forcedJSONParsing && !this.responseType) || JSONRequested)) {
+    if (data && lib_utils.isString(data) && ((forcedJSONParsing && !this.responseType) || JSONRequested)) {
       const silentJSONParsing = transitional && transitional.silentJSONParsing;
       const strictJSONParsing = !silentJSONParsing && JSONRequested;
 
@@ -7636,12 +7636,12 @@ const defaults = {
   }
 };
 
-utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+lib_utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
   defaults.headers[method] = {};
 });
 
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
+lib_utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  defaults.headers[method] = lib_utils.merge(DEFAULT_CONTENT_TYPE);
 });
 
 /* harmony default export */ const lib_defaults = (defaults);
@@ -7653,7 +7653,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 // RawAxiosHeaders whose duplicates are ignored by node
 // c.f. https://nodejs.org/api/http.html#http_message_headers
-const ignoreDuplicateOf = utils.toObjectSet([
+const ignoreDuplicateOf = lib_utils.toObjectSet([
   'age', 'authorization', 'content-length', 'content-type', 'etag',
   'expires', 'from', 'host', 'if-modified-since', 'if-unmodified-since',
   'last-modified', 'location', 'max-forwards', 'proxy-authorization',
@@ -7720,7 +7720,7 @@ function normalizeValue(value) {
     return value;
   }
 
-  return utils.isArray(value) ? value.map(normalizeValue) : String(value);
+  return lib_utils.isArray(value) ? value.map(normalizeValue) : String(value);
 }
 
 function parseTokens(str) {
@@ -7738,7 +7738,7 @@ function parseTokens(str) {
 const isValidHeaderName = (str) => /^[-_a-zA-Z0-9^`|~,!#$%&'*+.]+$/.test(str.trim());
 
 function matchHeaderValue(context, value, header, filter, isHeaderNameFilter) {
-  if (utils.isFunction(filter)) {
+  if (lib_utils.isFunction(filter)) {
     return filter.call(this, value, header);
   }
 
@@ -7746,13 +7746,13 @@ function matchHeaderValue(context, value, header, filter, isHeaderNameFilter) {
     value = header;
   }
 
-  if (!utils.isString(value)) return;
+  if (!lib_utils.isString(value)) return;
 
-  if (utils.isString(filter)) {
+  if (lib_utils.isString(filter)) {
     return value.indexOf(filter) !== -1;
   }
 
-  if (utils.isRegExp(filter)) {
+  if (lib_utils.isRegExp(filter)) {
     return filter.test(value);
   }
 }
@@ -7765,7 +7765,7 @@ function formatHeader(header) {
 }
 
 function buildAccessors(obj, header) {
-  const accessorName = utils.toCamelCase(' ' + header);
+  const accessorName = lib_utils.toCamelCase(' ' + header);
 
   ['get', 'set', 'has'].forEach(methodName => {
     Object.defineProperty(obj, methodName + accessorName, {
@@ -7792,7 +7792,7 @@ class AxiosHeaders {
         throw new Error('header name must be a non-empty string');
       }
 
-      const key = utils.findKey(self, lHeader);
+      const key = lib_utils.findKey(self, lHeader);
 
       if(!key || self[key] === undefined || _rewrite === true || (_rewrite === undefined && self[key] !== false)) {
         self[key || _header] = normalizeValue(_value);
@@ -7800,11 +7800,11 @@ class AxiosHeaders {
     }
 
     const setHeaders = (headers, _rewrite) =>
-      utils.forEach(headers, (_value, _header) => setHeader(_value, _header, _rewrite));
+      lib_utils.forEach(headers, (_value, _header) => setHeader(_value, _header, _rewrite));
 
-    if (utils.isPlainObject(header) || header instanceof this.constructor) {
+    if (lib_utils.isPlainObject(header) || header instanceof this.constructor) {
       setHeaders(header, valueOrRewrite)
-    } else if(utils.isString(header) && (header = header.trim()) && !isValidHeaderName(header)) {
+    } else if(lib_utils.isString(header) && (header = header.trim()) && !isValidHeaderName(header)) {
       setHeaders(parseHeaders(header), valueOrRewrite);
     } else {
       header != null && setHeader(valueOrRewrite, header, rewrite);
@@ -7817,7 +7817,7 @@ class AxiosHeaders {
     header = normalizeHeader(header);
 
     if (header) {
-      const key = utils.findKey(this, header);
+      const key = lib_utils.findKey(this, header);
 
       if (key) {
         const value = this[key];
@@ -7830,11 +7830,11 @@ class AxiosHeaders {
           return parseTokens(value);
         }
 
-        if (utils.isFunction(parser)) {
+        if (lib_utils.isFunction(parser)) {
           return parser.call(this, value, key);
         }
 
-        if (utils.isRegExp(parser)) {
+        if (lib_utils.isRegExp(parser)) {
           return parser.exec(value);
         }
 
@@ -7847,7 +7847,7 @@ class AxiosHeaders {
     header = normalizeHeader(header);
 
     if (header) {
-      const key = utils.findKey(this, header);
+      const key = lib_utils.findKey(this, header);
 
       return !!(key && this[key] !== undefined && (!matcher || matchHeaderValue(this, this[key], key, matcher)));
     }
@@ -7863,7 +7863,7 @@ class AxiosHeaders {
       _header = normalizeHeader(_header);
 
       if (_header) {
-        const key = utils.findKey(self, _header);
+        const key = lib_utils.findKey(self, _header);
 
         if (key && (!matcher || matchHeaderValue(self, self[key], key, matcher))) {
           delete self[key];
@@ -7873,7 +7873,7 @@ class AxiosHeaders {
       }
     }
 
-    if (utils.isArray(header)) {
+    if (lib_utils.isArray(header)) {
       header.forEach(deleteHeader);
     } else {
       deleteHeader(header);
@@ -7902,8 +7902,8 @@ class AxiosHeaders {
     const self = this;
     const headers = {};
 
-    utils.forEach(this, (value, header) => {
-      const key = utils.findKey(headers, header);
+    lib_utils.forEach(this, (value, header) => {
+      const key = lib_utils.findKey(headers, header);
 
       if (key) {
         self[key] = normalizeValue(value);
@@ -7932,8 +7932,8 @@ class AxiosHeaders {
   toJSON(asStrings) {
     const obj = Object.create(null);
 
-    utils.forEach(this, (value, header) => {
-      value != null && value !== false && (obj[header] = asStrings && utils.isArray(value) ? value.join(', ') : value);
+    lib_utils.forEach(this, (value, header) => {
+      value != null && value !== false && (obj[header] = asStrings && lib_utils.isArray(value) ? value.join(', ') : value);
     });
 
     return obj;
@@ -7980,7 +7980,7 @@ class AxiosHeaders {
       }
     }
 
-    utils.isArray(header) ? header.forEach(defineAccessor) : defineAccessor(header);
+    lib_utils.isArray(header) ? header.forEach(defineAccessor) : defineAccessor(header);
 
     return this;
   }
@@ -7988,8 +7988,8 @@ class AxiosHeaders {
 
 AxiosHeaders.accessor(['Content-Type', 'Content-Length', 'Accept', 'Accept-Encoding', 'User-Agent', 'Authorization']);
 
-utils.freezeMethods(AxiosHeaders.prototype);
-utils.freezeMethods(AxiosHeaders);
+lib_utils.freezeMethods(AxiosHeaders.prototype);
+lib_utils.freezeMethods(AxiosHeaders);
 
 /* harmony default export */ const core_AxiosHeaders = (AxiosHeaders);
 
@@ -8014,7 +8014,7 @@ function transformData(fns, response) {
   const headers = core_AxiosHeaders.from(context.headers);
   let data = context.data;
 
-  utils.forEach(fns, function transform(fn) {
+  lib_utils.forEach(fns, function transform(fn) {
     data = fn.call(config, data, headers.normalize(), response ? response.status : undefined);
   });
 
@@ -8051,7 +8051,7 @@ function CanceledError(message, config, request) {
   this.name = 'CanceledError';
 }
 
-utils.inherits(CanceledError, core_AxiosError, {
+lib_utils.inherits(CanceledError, core_AxiosError, {
   __CANCEL__: true
 });
 
@@ -8326,7 +8326,7 @@ const kInternals = Symbol('internals');
 
 class AxiosTransformStream extends external_stream_.Transform{
   constructor(options) {
-    options = utils.toFlatObject(options, {
+    options = lib_utils.toFlatObject(options, {
       maxRate: 0,
       chunkSize: 64 * 1024,
       minChunkSize: 100,
@@ -8334,7 +8334,7 @@ class AxiosTransformStream extends external_stream_.Transform{
       ticksRate: 2,
       samplesCount: 15
     }, null, (prop, source) => {
-      return !utils.isUndefined(source[prop]);
+      return !lib_utils.isUndefined(source[prop]);
     });
 
     super({
@@ -8532,7 +8532,7 @@ const readBlob = async function* (blob) {
 
 
 
-const BOUNDARY_ALPHABET = utils.ALPHABET.ALPHA_DIGIT + '-_';
+const BOUNDARY_ALPHABET = lib_utils.ALPHABET.ALPHA_DIGIT + '-_';
 
 const textEncoder = new external_util_.TextEncoder();
 
@@ -8543,7 +8543,7 @@ const CRLF_BYTES_COUNT = 2;
 class FormDataPart {
   constructor(name, value) {
     const {escapeName} = this.constructor;
-    const isStringValue = utils.isString(value);
+    const isStringValue = lib_utils.isString(value);
 
     let headers = `Content-Disposition: form-data; name="${escapeName(name)}"${
       !isStringValue && value.name ? `; filename="${escapeName(value.name)}"` : ''
@@ -8570,7 +8570,7 @@ class FormDataPart {
 
     const {value} = this;
 
-    if(utils.isTypedArray(value)) {
+    if(lib_utils.isTypedArray(value)) {
       yield value;
     } else {
       yield* helpers_readBlob(value);
@@ -8592,10 +8592,10 @@ const formDataToStream = (form, headersHandler, options) => {
   const {
     tag = 'form-data-boundary',
     size = 25,
-    boundary = tag + '-' + utils.generateString(size, BOUNDARY_ALPHABET)
+    boundary = tag + '-' + lib_utils.generateString(size, BOUNDARY_ALPHABET)
   } = options || {};
 
-  if(!utils.isFormData(form)) {
+  if(!lib_utils.isFormData(form)) {
     throw TypeError('FormData instance required');
   }
 
@@ -8615,7 +8615,7 @@ const formDataToStream = (form, headersHandler, options) => {
 
   contentLength += boundaryBytes.byteLength * parts.length;
 
-  contentLength = utils.toFiniteNumber(contentLength);
+  contentLength = lib_utils.toFiniteNumber(contentLength);
 
   const computedHeaders = {
     'Content-Type': `multipart/form-data; boundary=${boundary}`
@@ -8673,7 +8673,7 @@ class ZlibHeaderTransformStream extends external_stream_.Transform {
 
 
 const callbackify = (fn, reducer) => {
-  return utils.isAsyncFn(fn) ? function (...args) {
+  return lib_utils.isAsyncFn(fn) ? function (...args) {
     const cb = args.pop();
     fn.apply(this, args).then((value) => {
       try {
@@ -8725,7 +8725,7 @@ const brotliOptions = {
   finishFlush: external_zlib_namespaceObject.constants.BROTLI_OPERATION_FLUSH
 }
 
-const isBrotliSupported = utils.isFunction(external_zlib_namespaceObject.createBrotliDecompress);
+const isBrotliSupported = lib_utils.isFunction(external_zlib_namespaceObject.createBrotliDecompress);
 
 const {http: httpFollow, https: httpsFollow} = follow_redirects;
 
@@ -8805,7 +8805,7 @@ function setProxy(options, configProxy, location) {
   };
 }
 
-const isHttpAdapterSupported = typeof process !== 'undefined' && utils.kindOf(process) === 'process';
+const isHttpAdapterSupported = typeof process !== 'undefined' && lib_utils.kindOf(process) === 'process';
 
 // temporary hotfix
 
@@ -8844,11 +8844,11 @@ const wrapAsync = (asyncExecutor) => {
     let rejected = false;
     let req;
 
-    if (lookup && utils.isAsyncFn(lookup)) {
+    if (lookup && lib_utils.isAsyncFn(lookup)) {
       lookup = helpers_callbackify(lookup, (entry) => {
-        if(utils.isString(entry)) {
+        if(lib_utils.isString(entry)) {
           entry = [entry, entry.indexOf('.') < 0 ? 6 : 4]
-        } else if (!utils.isArray(entry)) {
+        } else if (!lib_utils.isArray(entry)) {
           throw new TypeError('lookup async function must return an array [ip: string, family: number]]')
         }
         return entry;
@@ -8920,7 +8920,7 @@ const wrapAsync = (asyncExecutor) => {
         convertedData = convertedData.toString(responseEncoding);
 
         if (!responseEncoding || responseEncoding === 'utf8') {
-          convertedData = utils.stripBOM(convertedData);
+          convertedData = lib_utils.stripBOM(convertedData);
         }
       } else if (responseType === 'stream') {
         convertedData = external_stream_.Readable.from(convertedData);
@@ -8958,7 +8958,7 @@ const wrapAsync = (asyncExecutor) => {
     let maxDownloadRate = undefined;
 
     // support for spec compliant FormData objects
-    if (utils.isSpecCompliantForm(data)) {
+    if (lib_utils.isSpecCompliantForm(data)) {
       const userBoundary = headers.getContentType(/boundary=([-_\w\d]{10,70})/i);
 
       data = helpers_formDataToStream(data, (formHeaders) => {
@@ -8968,7 +8968,7 @@ const wrapAsync = (asyncExecutor) => {
         boundary: userBoundary && userBoundary[1] || undefined
       });
       // support for https://www.npmjs.com/package/form-data api
-    } else if (utils.isFormData(data) && utils.isFunction(data.getHeaders)) {
+    } else if (lib_utils.isFormData(data) && lib_utils.isFunction(data.getHeaders)) {
       headers.set(data.getHeaders());
 
       if (!headers.hasContentLength()) {
@@ -8979,16 +8979,16 @@ const wrapAsync = (asyncExecutor) => {
         } catch (e) {
         }
       }
-    } else if (utils.isBlob(data)) {
+    } else if (lib_utils.isBlob(data)) {
       data.size && headers.setContentType(data.type || 'application/octet-stream');
       headers.setContentLength(data.size || 0);
       data = external_stream_.Readable.from(helpers_readBlob(data));
-    } else if (data && !utils.isStream(data)) {
+    } else if (data && !lib_utils.isStream(data)) {
       if (Buffer.isBuffer(data)) {
         // Nothing to do...
-      } else if (utils.isArrayBuffer(data)) {
+      } else if (lib_utils.isArrayBuffer(data)) {
         data = Buffer.from(new Uint8Array(data));
-      } else if (utils.isString(data)) {
+      } else if (lib_utils.isString(data)) {
         data = Buffer.from(data, 'utf-8');
       } else {
         return reject(new core_AxiosError(
@@ -9010,9 +9010,9 @@ const wrapAsync = (asyncExecutor) => {
       }
     }
 
-    const contentLength = utils.toFiniteNumber(headers.getContentLength());
+    const contentLength = lib_utils.toFiniteNumber(headers.getContentLength());
 
-    if (utils.isArray(maxRate)) {
+    if (lib_utils.isArray(maxRate)) {
       maxUploadRate = maxRate[0];
       maxDownloadRate = maxRate[1];
     } else {
@@ -9020,14 +9020,14 @@ const wrapAsync = (asyncExecutor) => {
     }
 
     if (data && (onUploadProgress || maxUploadRate)) {
-      if (!utils.isStream(data)) {
+      if (!lib_utils.isStream(data)) {
         data = external_stream_.Readable.from(data, {objectMode: false});
       }
 
       data = external_stream_.pipeline([data, new helpers_AxiosTransformStream({
         length: contentLength,
-        maxRate: utils.toFiniteNumber(maxUploadRate)
-      })], utils.noop);
+        maxRate: lib_utils.toFiniteNumber(maxUploadRate)
+      })], lib_utils.noop);
 
       onUploadProgress && data.on('progress', progress => {
         onUploadProgress(Object.assign(progress, {
@@ -9132,8 +9132,8 @@ const wrapAsync = (asyncExecutor) => {
 
       if (onDownloadProgress) {
         const transformStream = new helpers_AxiosTransformStream({
-          length: utils.toFiniteNumber(responseLength),
-          maxRate: utils.toFiniteNumber(maxDownloadRate)
+          length: lib_utils.toFiniteNumber(responseLength),
+          maxRate: lib_utils.toFiniteNumber(maxDownloadRate)
         });
 
         onDownloadProgress && transformStream.on('progress', progress => {
@@ -9188,7 +9188,7 @@ const wrapAsync = (asyncExecutor) => {
         }
       }
 
-      responseStream = streams.length > 1 ? external_stream_.pipeline(streams, utils.noop) : streams[0];
+      responseStream = streams.length > 1 ? external_stream_.pipeline(streams, lib_utils.noop) : streams[0];
 
       const offListeners = external_stream_.finished(responseStream, () => {
         offListeners();
@@ -9250,7 +9250,7 @@ const wrapAsync = (asyncExecutor) => {
             if (responseType !== 'arraybuffer') {
               responseData = responseData.toString(responseEncoding);
               if (!responseEncoding || responseEncoding === 'utf8') {
-                responseData = utils.stripBOM(responseData);
+                responseData = lib_utils.stripBOM(responseData);
               }
             }
             response.data = responseData;
@@ -9327,7 +9327,7 @@ const wrapAsync = (asyncExecutor) => {
 
 
     // Send the request
-    if (utils.isStream(data)) {
+    if (lib_utils.isStream(data)) {
       let ended = false;
       let errored = false;
 
@@ -9370,15 +9370,15 @@ const __setProxy = (/* unused pure expression or super */ null && (setProxy));
         const cookie = [];
         cookie.push(name + '=' + encodeURIComponent(value));
 
-        if (utils.isNumber(expires)) {
+        if (lib_utils.isNumber(expires)) {
           cookie.push('expires=' + new Date(expires).toGMTString());
         }
 
-        if (utils.isString(path)) {
+        if (lib_utils.isString(path)) {
           cookie.push('path=' + path);
         }
 
-        if (utils.isString(domain)) {
+        if (lib_utils.isString(domain)) {
           cookie.push('domain=' + domain);
         }
 
@@ -9465,7 +9465,7 @@ const __setProxy = (/* unused pure expression or super */ null && (setProxy));
     * @returns {boolean} True if URL shares the same origin, otherwise false
     */
     return function isURLSameOrigin(requestURL) {
-      const parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
+      const parsed = (lib_utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
       return (parsed.protocol === originURL.protocol &&
           parsed.host === originURL.host);
     };
@@ -9542,7 +9542,7 @@ const isXHRAdapterSupported = typeof XMLHttpRequest !== 'undefined';
       }
     }
 
-    if (utils.isFormData(requestData)) {
+    if (lib_utils.isFormData(requestData)) {
       if (node.isStandardBrowserEnv || node.isStandardBrowserWebWorkerEnv) {
         requestHeaders.setContentType(false); // Let the browser set it
       } else {
@@ -9677,13 +9677,13 @@ const isXHRAdapterSupported = typeof XMLHttpRequest !== 'undefined';
 
     // Add headers to the request
     if ('setRequestHeader' in request) {
-      utils.forEach(requestHeaders.toJSON(), function setRequestHeader(val, key) {
+      lib_utils.forEach(requestHeaders.toJSON(), function setRequestHeader(val, key) {
         request.setRequestHeader(key, val);
       });
     }
 
     // Add withCredentials to request if needed
-    if (!utils.isUndefined(config.withCredentials)) {
+    if (!lib_utils.isUndefined(config.withCredentials)) {
       request.withCredentials = !!config.withCredentials;
     }
 
@@ -9744,7 +9744,7 @@ const knownAdapters = {
   xhr: xhr
 }
 
-utils.forEach(knownAdapters, (fn, value) => {
+lib_utils.forEach(knownAdapters, (fn, value) => {
   if(fn) {
     try {
       Object.defineProperty(fn, 'name', {value});
@@ -9757,7 +9757,7 @@ utils.forEach(knownAdapters, (fn, value) => {
 
 /* harmony default export */ const adapters = ({
   getAdapter: (adapters) => {
-    adapters = utils.isArray(adapters) ? adapters : [adapters];
+    adapters = lib_utils.isArray(adapters) ? adapters : [adapters];
 
     const {length} = adapters;
     let nameOrAdapter;
@@ -9765,7 +9765,7 @@ utils.forEach(knownAdapters, (fn, value) => {
 
     for (let i = 0; i < length; i++) {
       nameOrAdapter = adapters[i];
-      if((adapter = utils.isString(nameOrAdapter) ? knownAdapters[nameOrAdapter.toLowerCase()] : nameOrAdapter)) {
+      if((adapter = lib_utils.isString(nameOrAdapter) ? knownAdapters[nameOrAdapter.toLowerCase()] : nameOrAdapter)) {
         break;
       }
     }
@@ -9779,13 +9779,13 @@ utils.forEach(knownAdapters, (fn, value) => {
       }
 
       throw new Error(
-        utils.hasOwnProp(knownAdapters, nameOrAdapter) ?
+        lib_utils.hasOwnProp(knownAdapters, nameOrAdapter) ?
           `Adapter '${nameOrAdapter}' is not available in the build` :
           `Unknown adapter '${nameOrAdapter}'`
       );
     }
 
-    if (!utils.isFunction(adapter)) {
+    if (!lib_utils.isFunction(adapter)) {
       throw new TypeError('adapter is not a function');
     }
 
@@ -9900,11 +9900,11 @@ function mergeConfig(config1, config2) {
   const config = {};
 
   function getMergedValue(target, source, caseless) {
-    if (utils.isPlainObject(target) && utils.isPlainObject(source)) {
-      return utils.merge.call({caseless}, target, source);
-    } else if (utils.isPlainObject(source)) {
-      return utils.merge({}, source);
-    } else if (utils.isArray(source)) {
+    if (lib_utils.isPlainObject(target) && lib_utils.isPlainObject(source)) {
+      return lib_utils.merge.call({caseless}, target, source);
+    } else if (lib_utils.isPlainObject(source)) {
+      return lib_utils.merge({}, source);
+    } else if (lib_utils.isArray(source)) {
       return source.slice();
     }
     return source;
@@ -9912,25 +9912,25 @@ function mergeConfig(config1, config2) {
 
   // eslint-disable-next-line consistent-return
   function mergeDeepProperties(a, b, caseless) {
-    if (!utils.isUndefined(b)) {
+    if (!lib_utils.isUndefined(b)) {
       return getMergedValue(a, b, caseless);
-    } else if (!utils.isUndefined(a)) {
+    } else if (!lib_utils.isUndefined(a)) {
       return getMergedValue(undefined, a, caseless);
     }
   }
 
   // eslint-disable-next-line consistent-return
   function valueFromConfig2(a, b) {
-    if (!utils.isUndefined(b)) {
+    if (!lib_utils.isUndefined(b)) {
       return getMergedValue(undefined, b);
     }
   }
 
   // eslint-disable-next-line consistent-return
   function defaultToConfig2(a, b) {
-    if (!utils.isUndefined(b)) {
+    if (!lib_utils.isUndefined(b)) {
       return getMergedValue(undefined, b);
-    } else if (!utils.isUndefined(a)) {
+    } else if (!lib_utils.isUndefined(a)) {
       return getMergedValue(undefined, a);
     }
   }
@@ -9975,10 +9975,10 @@ function mergeConfig(config1, config2) {
     headers: (a, b) => mergeDeepProperties(headersToObject(a), headersToObject(b), true)
   };
 
-  utils.forEach(Object.keys(Object.assign({}, config1, config2)), function computeConfigValue(prop) {
+  lib_utils.forEach(Object.keys(Object.assign({}, config1, config2)), function computeConfigValue(prop) {
     const merge = mergeMap[prop] || mergeDeepProperties;
     const configValue = merge(config1[prop], config2[prop], prop);
-    (utils.isUndefined(configValue) && merge !== mergeDirectKeys) || (config[prop] = configValue);
+    (lib_utils.isUndefined(configValue) && merge !== mergeDirectKeys) || (config[prop] = configValue);
   });
 
   return config;
@@ -10138,7 +10138,7 @@ class Axios {
     }
 
     if (paramsSerializer != null) {
-      if (utils.isFunction(paramsSerializer)) {
+      if (lib_utils.isFunction(paramsSerializer)) {
         config.paramsSerializer = {
           serialize: paramsSerializer
         }
@@ -10156,12 +10156,12 @@ class Axios {
     let contextHeaders;
 
     // Flatten headers
-    contextHeaders = headers && utils.merge(
+    contextHeaders = headers && lib_utils.merge(
       headers.common,
       headers[config.method]
     );
 
-    contextHeaders && utils.forEach(
+    contextHeaders && lib_utils.forEach(
       ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
       (method) => {
         delete headers[method];
@@ -10248,7 +10248,7 @@ class Axios {
 }
 
 // Provide aliases for supported request methods
-utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
+lib_utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
   /*eslint func-names:0*/
   Axios.prototype[method] = function(url, config) {
     return this.request(mergeConfig(config || {}, {
@@ -10259,7 +10259,7 @@ utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData
   };
 });
 
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+lib_utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
   /*eslint func-names:0*/
 
   function generateHTTPMethod(isForm) {
@@ -10448,7 +10448,7 @@ function spread(callback) {
  * @returns {boolean} True if the payload is an error thrown by Axios, otherwise false
  */
 function isAxiosError(payload) {
-  return utils.isObject(payload) && (payload.isAxiosError === true);
+  return lib_utils.isObject(payload) && (payload.isAxiosError === true);
 }
 
 ;// CONCATENATED MODULE: ./node_modules/axios/lib/helpers/HttpStatusCode.js
@@ -10556,10 +10556,10 @@ function createInstance(defaultConfig) {
   const instance = bind(core_Axios.prototype.request, context);
 
   // Copy axios.prototype to instance
-  utils.extend(instance, core_Axios.prototype, context, {allOwnKeys: true});
+  lib_utils.extend(instance, core_Axios.prototype, context, {allOwnKeys: true});
 
   // Copy context to instance
-  utils.extend(instance, context, null, {allOwnKeys: true});
+  lib_utils.extend(instance, context, null, {allOwnKeys: true});
 
   // Factory for creating new instances
   instance.create = function create(instanceConfig) {
@@ -10603,7 +10603,7 @@ axios.mergeConfig = mergeConfig;
 
 axios.AxiosHeaders = core_AxiosHeaders;
 
-axios.formToJSON = thing => helpers_formDataToJSON(utils.isHTMLForm(thing) ? new FormData(thing) : thing);
+axios.formToJSON = thing => helpers_formDataToJSON(lib_utils.isHTMLForm(thing) ? new FormData(thing) : thing);
 
 axios.HttpStatusCode = helpers_HttpStatusCode;
 
@@ -10614,7 +10614,227 @@ axios.default = axios;
 
 ;// CONCATENATED MODULE: external "querystring"
 const external_querystring_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("querystring");
+;// CONCATENATED MODULE: ./node_modules/ea-utils/errors.js
+const errors = [
+      {
+        "key": "Null Arguments",
+        "icode": "AD.100",
+        "displayString": "One or more method arguemnts are null: $VARIABLE$ $VARIABLE$ $VARIABLE$",
+        "recommendation": "Verify your arguments are what they expect"
+      },
+      {
+        "key": "Unfinished Automation",
+        "icode": "AD.101",
+        "displayString": "Automation $VARIABLE$ is not finished! Automation State: $VARIABLE$",
+        "recommendation": "Wait for the automation to finish before retrieving metrics"
+      },
+      {
+        "key": "Axios Error",
+        "icode": "AD.102",
+        "displayString": "Error making the HTTP Request",
+        "recommendation": "Verify that your url and request parameters are correct"
+      },
+      {
+        "key": "Empty Arguments",
+        "icode": "AD.110",
+        "displayString": "One or more method arguemnts are empty: $VARIABLE$ $VARIABLE$ $VARIABLE$",
+        "recommendation": "Ensure your method arguments are not being passed as empty strings or arrays"
+      },
+      {
+        "key": "Can't Find Trigger",
+        "icode": "AD.111",
+        "displayString": "Unable to find trigger: $VARIABLE$ when attempting to start automation $VARIABLE$",
+        "recommendation": "Verify that the correct trigger name is specified in the method arguments"
+      },
+      {
+        "key": "Can't Find Automation",
+        "icode": "AD.112",
+        "displayString": "Unable to find automation: $VARIABLE$",
+        "recommendation": "Verify that the correct automation name is specified in the method arguments"
+      },
+      {
+        "key": "Invalid HTTP Method",
+        "icode": "AD.113",
+        "displayString": "The HTTP Method you specificed was invalid",
+        "recommendation": "Enter one of the following for the HTTP Method: GET, PUT, POST, DELETE"
+      },
+      {
+        "key": "Error when fetching or renewing a token",
+        "icode": "AD.300",
+        "displayString": "Error when fetching a new token with credentials: $VARIABLE$ $VARIABLE$",
+        "recommendation": "Ensure your username and password (or permanent token) are correct in the application configuration"
+      },
+      {
+        "key": "Error when fetching or renewing an OAuth token",
+        "icode": "AD.301",
+        "displayString": "Error when fetching a new token with credentials: $VARIABLE$ $VARIABLE$ $VARIABLE$",
+        "recommendation": "Ensure your OAuth credentials are correct"
+      },
+      {
+        "key": "User Validation Error",
+        "icode": "AD.302",
+        "displayString": "For $VARIABLE$ authentication, manadatory properties $VARIABLE$ is missing",
+        "recommendation": "Ensure your user object has the correct properties"
+      },
+      {
+        "key": "User doesn't exist",
+        "icode": "AD.303",
+        "displayString": "User doesn't exist: the authentication id doesn't match what exists in the table",
+        "recommendation": "Ensure your your authenticaion credentials are correct"
+      },
+      {
+        "key": "Token doesn't exist",
+        "icode": "AD.303",
+        "displayString": "Username/Password nor token present for verification",
+        "recommendation": "Ensure your account either can be authenticated via username/password or token"
+      }
+];
+;// CONCATENATED MODULE: ./node_modules/ea-utils/utils.js
+
+
+class Utils {
+    
+    constructor(){
+        this.errors = errors;
+    }
+
+    /**
+    * @summary Build a standard error object from the data provided
+    *
+    * @function formatErrorObject
+    * @param {String} origin - the originator of the error (optional).
+    * @param {String} type - the internal error type (optional).
+    * @param {Array} variables - the variables to put into the error message (optional).
+    * @param {Integer} sysCode - the error code from the other system (optional).
+    * @param {Object} sysRes - the raw response from the other system (optional).
+    * @param {Exception} stack - any available stack trace from the issue (optional).
+    *
+    * @return {Object} - the error object, null if missing pertinent information
+    */
+    formatErrorObject(origin, type, variables, sysCode, sysRes, stack){
+        // add the required fields
+        const errorObject = {
+            icode: 'AD.999',
+            IAPerror: {
+                origin: `Itential EcoSystem Applications SDK`,
+                displayString: 'error not provided',
+                recommendation: 'report this issue to the ecosystem applications team!'
+            }
+        };
+
+        if (origin) {
+            errorObject.IAPerror.origin = origin;
+        }
+        if (type) {
+            errorObject.IAPerror.displayString = type;
+        }
+
+        // add the messages from the error.json
+        for (let e = 0; e < this.errors.length; e += 1) {
+            if (this.errors[e].key === type) {
+                errorObject.icode = this.errors[e].icode;
+                errorObject.IAPerror.displayString = this.errors[e].displayString;
+                errorObject.IAPerror.recommendation = this.errors[e].recommendation;
+            } else if (this.errors[e].icode === type) {
+                errorObject.icode = this.errors[e].icode;
+                errorObject.IAPerror.displayString = this.errors[e].displayString;
+                errorObject.IAPerror.recommendation = this.errors[e].recommendation;
+            }
+        }
+
+        // replace the variables
+        let varCnt = 0;
+        while (errorObject.IAPerror.displayString.indexOf('$VARIABLE$') >= 0) {
+            let curVar = '';
+
+            // get the current variable
+            if (variables && Array.isArray(variables) && variables.length >= varCnt + 1) {
+                curVar = variables[varCnt];
+            }
+            varCnt += 1;
+            errorObject.IAPerror.displayString = errorObject.IAPerror.displayString.replace('$VARIABLE$', curVar);
+        }
+
+        // add all of the optional fields
+        if (sysCode) {
+            errorObject.IAPerror.code = sysCode;
+        }
+        if (sysRes) {
+            errorObject.IAPerror.raw_response = sysRes;
+        }
+
+        // Mask sensitive fields in reqHdr
+        const sensitiveWords = /auth|token|x|key/i;
+        if (errorObject.IAPerror.raw_response && errorObject.IAPerror.raw_response.reqHdr) {
+            Object.keys(errorObject.IAPerror.raw_response.reqHdr).forEach((key) => {
+                if (sensitiveWords.test(key)) {
+                errorObject.IAPerror.raw_response.reqHdr[key] = '****';
+                }
+            });
+        }
+
+        if (stack) {
+            errorObject.IAPerror.stack = stack;
+        }
+
+        // return the object
+        return errorObject;
+
+    }
+
+    formatAxiosRequest(baseURL, endpoint, token_object){
+        const authType =  token_object.authType; 
+        const token = token_object.token;
+
+        const formatted_req = {
+            url: null,
+            config: undefined
+        };
+
+        if(authType.basic || authType.staticToken){
+            formatted_req.url = `${baseURL}${endpoint}?token=${token}`;
+
+        }else { // its oAuth type
+            formatted_req.url = `${baseURL}${endpoint}`;
+            formatted_req.config = {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
+            };
+        
+        }
+
+        return formatted_req;
+
+    }
+
+
+    // getMarketingMessage(){
+    //     return <body>
+    //     <div id="root"></div>
+    //     <h1>Customer Support</h1>
+    //     <span> You would need an Itential account to get the credentials to configure the ServiceNow application.</span>
+    //     <br/>
+    //     <span>In order to utilize this application, you would need to have an active
+    //                 Itential Automation Platform (IAP). If you are an existing
+    //                 customer, please contact your Itential account team for
+    //                 additional details. &#xA0;</span> 
+    //     <br/>
+    //     <span> For new customers interested in an Itential trial please click&#xA0; </span>
+    //     <a href="https://www.itential.com/get-started/" target="_blank" rel="noopener noreferrer">here</a>
+    //     <span>&#xA0; to request one.</span>
+    //     <br/>
+    //     <span> Additional details can be found in our &#xA0;</span> <a href="https://docs.itential.com/opensource/docs/servicenow-application" target="_blank" rel="noopener noreferrer"> user guide</a>
+    //     <br/>
+    //     <span> Reach out to Itential for additional ServiceNow application support. &#xA0;</span> <a href="mailto:snow@itential.com">snow@itential.com</a>
+    //     <br/>
+    //     <a href="https://www.itential.com/" target="_blank" rel="noopener noreferrer">Itential</a>
+    // </body>
+    // }
+
+}
 ;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/authApi.js
+
 
 
 
@@ -10622,6 +10842,7 @@ class Authentication {
   constructor(instanceList) {
     this.default_expiry_duration = 60; // in minutes, set it to 60 minutes
     this.users = this.validateList(instanceList);
+    this.utils = new Utils();
   }
 
   getIndex(authId) {
@@ -10674,7 +10895,8 @@ class Authentication {
       console.log('the new token', this.users[indx].expires_in);
       return callback(this.users[indx].token);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("authentication-getNewPasswToken", "Error when fetching or renewing a token", null, null, null, err);
+      return callback(null, error);
     }
   }
 
@@ -10699,7 +10921,8 @@ class Authentication {
       console.log('the renewed token ', this.users[indx].token);
       return callback(this.users[indx].token);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("authentication-renewPasswToken", "Error when fetching or renewing a token", null, null, null, err);
+      return callback(null, error);
     }
   }
 
@@ -10728,8 +10951,8 @@ class Authentication {
       this.users[indx].expires_in = timeNow.setMinutes(timeNow.getMinutes() + 1);*/
       return callback(this.users[indx].token);
     } catch (err) {
-      console.log('got error');
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("authentication-getNewOAuthToken", "Error when fetching or renewing an OAuth token", null, null, null, err);
+      return callback(null, error);
     }
   }
 
@@ -10757,23 +10980,34 @@ class Authentication {
       console.log('expiry of renewed Token', timeNow);
       return callback(this.users[indx].token);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("authentication-renewOAuthToken", "Error when fetching or renewing an OAuth token", null, null, null, err);
+      return callback(null, error);
     }
   }
 
   async getToken(authId, callback) {
     try {
       const indx = this.getIndex(authId);
-      if (indx === -1) return callback(null, 'User does not exist, authId doesn\'t match');
+      if (indx === -1) {
+        const error = this.utils.formatErrorObject("authentication-getToken", "User doesn't exist", null, null, null, null);
+        return callback(null, error);
+      }
+
+      //valid token return object 
+      const token_object = {
+        token: null,
+        authType: this.users[indx].authType
+      } 
+
       // check if token exists
       if (this.users[indx].token.length !== 0) {
         // check token validity
         const valid = this.checkTokenValidity(indx);
         // if valid return value
         if (valid === true) {
-          return callback(this.users[indx].token); // token exists
+          token_object.token =  this.users[indx].token;
+          return callback(token_object); // token exists
         }
-
         // else renew token
         // if OAuth user
         if (this.users[indx].authType.oAuth) {
@@ -10781,7 +11015,8 @@ class Authentication {
             if (err) {
               return callback(null, err);
             }
-            return callback(res);
+            token_object.token = res;
+            return callback(token_object);
           });
         } else {
           // else password user
@@ -10789,7 +11024,8 @@ class Authentication {
             if (err) {
               return callback(null, err);
             }
-            return callback(res);
+            token_object.token = res;
+            return callback(token_object);
           });
         }
       } else if (this.users[indx].authType.oAuth) {
@@ -10800,24 +11036,26 @@ class Authentication {
             return callback(null, err);
           }
           console.log('not here');
-          return callback(res);
+          token_object.token = res;
+          return callback(token_object);
         });
-      } else if (this.users[indx].authType.passwordBased) {
+      } else if (this.users[indx].authType.basic) {
         // password user
         await this.getNewPasswToken(indx, (res, err) => {
           if (err) {
             return callback(null, err);
           }
-          return callback(res);
+          token_object.token = res;
+          return callback(token_object);
         });
-      } else return callback(null, 'No token, No password');
+      } else {
+        const error = this.utils.formatErrorObject("authentication-getToken", "Token doesn't exist", null, null, null, null);
+        return callback(null, error);
+      }
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("authentication-getToken", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
-  }
-
-  setUsers(updatedUsers) {
-    this.users = this.validateList(updatedUsers);
   }
 
   getUsers() {
@@ -10826,36 +11064,29 @@ class Authentication {
 
   checkValidUser(checkUser) {
     const user = checkUser;
-    const errorMessage = [];
+    let errorMessage = '';
     const authType = {
       oAuth: false,
-      passwordBased: false,
+      basic: false,
       staticToken: false
     };
     // console.log(user);
     if (!Object.prototype.hasOwnProperty.call(user, 'hostname') || !user.hostname.length) {
-      errorMessage.push('For authentication, manadatory property \'hostname\' is missing');
-    }
-    if (Object.prototype.hasOwnProperty.call(user, 'client_id') || Object.prototype.hasOwnProperty.call(user, 'client_secret')
-    || Object.prototype.hasOwnProperty.call(user, 'grant_type')) {
-      if (Object.prototype.hasOwnProperty.call(user, 'client_id') && user.client_id.length
-      && Object.prototype.hasOwnProperty.call(user, 'client_secret') && user.client_secret.length
-      && Object.prototype.hasOwnProperty.call(user, 'grant_type') && user.grant_type.length) {
-        authType.oAuth = true;
-      } else errorMessage.push('For OAuth based authentication, manadatory properties \'client_id\' or \'client_secret\' or \'grant_type\' is missing');
-    } else if (Object.prototype.hasOwnProperty.call(user, 'token') && user.token.length) {
-      authType.staticToken = true;
-    } else if (Object.prototype.hasOwnProperty.call(user, 'username') || Object.prototype.hasOwnProperty.call(user, 'password')) {
-      if (Object.prototype.hasOwnProperty.call(user, 'username') && Object.prototype.hasOwnProperty.call(user, 'password')
-        && user.username.length && user.password.length) {
-        authType.passwordBased = true;
-      } else {
-        errorMessage.push('For Password based authentication, manadatory properties \'username\' or \'password\' is missing or for static token based authentication, \'token\' is missing');
-      }
+      errorMessage = 'For authentication, manadatory property \'hostname\' is missing';
     } else {
-      errorMessage.push('For authentication , manadatory properties \'token\' or \'client_id\' or \'username\' is missing');
+      if (Object.prototype.hasOwnProperty.call(user, 'token') && user.token.length) {
+        authType.staticToken = true;
+      } else if (Object.prototype.hasOwnProperty.call(user, 'username') && Object.prototype.hasOwnProperty.call(user, 'password')
+        && user.username.length && user.password.length) {
+        authType.basic = true;
+      } else if (Object.prototype.hasOwnProperty.call(user, 'client_id') && user.client_id.length
+        && Object.prototype.hasOwnProperty.call(user, 'client_secret') && user.client_secret.length) {
+        authType.oAuth = true;
+      }  else {
+        errorMessage = `For authentication, manadatory properties and values as per auth type is missing: static token type - \'token\'; basic type - \'username\' , \'password\'; OAuth2 type: \'client_id\' , \'client_secret\', \'grant_type\'`;
+      }
     }
-
+    
     if (errorMessage.length > 0) {
       // console.log(errorMessage);
       user.errorMessage = errorMessage;
@@ -10870,9 +11101,8 @@ class Authentication {
   }
 
   validateList(userList) {
-    const userError = [];
     const usersInitial = [];
-
+    
     userList.forEach((checkUser) => {
 
       if(!Object.prototype.hasOwnProperty.call(checkUser, 'validity') || checkUser.validity === false){
@@ -10892,6 +11122,7 @@ class Authentication {
             user.token = '';
             user.expires_in = null;
             user.userKey = user.client_id;
+            user.grant_type = "client_credentials"; //hardcoded since unlikely to change for IAP
           } else if (user.authType.staticToken) {
             user.authId = `${user.hostname}_${user.token}`;
             user.expires_in = -1; //* assuming static_token does not expire
@@ -10918,6 +11149,7 @@ class Authentication {
 
 ;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/genericApi.js
 
+
 /**
  * Class that performs generic api requests to Itential services.
  */
@@ -10926,6 +11158,7 @@ class GenericAPI {
     this.user = user;
     this.baseURL = baseURL;
     this.auth = auth;
+    this.utils = new Utils();
   }
 
   /**
@@ -10940,54 +11173,88 @@ class GenericAPI {
    */
   async genericRequest(method, hyperSchema, href, callback, data = {}) {
     try {
-      let token = '';
-      await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
+      let token_object = {};
+      await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
         if (error) {
+          error.IAPerror.origin = 'generic-genericRequest';
           return callback(null, error);
         }
-        token = theToken;
+        token_object = token_obj;
       });
       if (method === null || hyperSchema === null || href === null) {
-        return callback(null, 'One or more method arguemnts are null');
+        const error = this.utils.formatErrorObject("generic-genericRequest", "Null Arguments", ["method", "hyperSchema", "href"], null, null, null);
+        return callback(null, error);
       }
       if (method === '' || hyperSchema === '' || href === '') {
-        return callback(null, 'One or more method arguments are empty');
+        const error = this.utils.formatErrorObject("generic-genericRequest", "Empty Arguments", ["method", "hyperSchema", "href"], null, null, null);
+        return callback(null, error);
       }
       let axiosRequest = {};
-      if (method === 'POST' || method === 'DELETE' || method === 'PUT') {
-        axiosRequest = {
-          method,
-          data,
-          url:
-            `${this.baseURL}${hyperSchema}${href}?token=${token}`
-        };
-        const res = await lib_axios(axiosRequest);
-        return callback(res, null);
-      } if (method === 'GET') {
-        axiosRequest = {
-          method,
-          url:
-            `${this.baseURL}${hyperSchema}${href}?token=${token}`
-        };
-        const res = await lib_axios(axiosRequest);
-        return callback(res, null);
+
+      if(token_object.authType.oAuth){
+
+        const formatted_req = utils.formatAxiosRequest(this.baseURL, `${hyperSchema}${href}`, token_object);
+        const headers = formatted_req.config.headers;
+
+        if (method === 'POST' || method === 'DELETE' || method === 'PUT') {
+          axiosRequest = {
+            method,
+            data,
+            url:
+              formatted_req.url,
+            headers
+          };
+        } else if (method === 'GET') {
+          axiosRequest = {
+            method,
+            url:
+              formatted_req.url,
+            headers
+          };
+        }
+  
+      }else {  // for basic or static token
+
+        if (method === 'POST' || method === 'DELETE' || method === 'PUT') {
+          axiosRequest = {
+            method,
+            data,
+            url:
+              `${this.baseURL}${hyperSchema}${href}?token=${token_object.token}`
+          };
+        } else if (method === 'GET') {
+          axiosRequest = {
+            method,
+            url:
+              `${this.baseURL}${hyperSchema}${href}?token=${token_object.token}`
+          };
+        }
+
       }
-      return callback(null, 'Invalid HTTP Method');
+
+      const res = await lib_axios(axiosRequest);
+      return callback(res, null);
+
+      const error = this.utils.formatErrorObject("generic-genericReqiest", "Invalid HTTP Method", null, null, null, null);
+      return callback(null, error);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("generic-genericReqiest", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
   }
 }
-;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/jsonFormsApi.js
+;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/formsApi.js
+
 
 /**
  * Class that utilizes Itential's JSON Forms API to perform pipeline actions.
  */
-class JSONFormsAPI {
+class FormsAPI {
   constructor(baseURL, user, auth) {
     this.user = user;
     this.baseURL = baseURL;
     this.auth = auth;
+    this.utils = new Utils();
   }
 
   /**
@@ -10999,37 +11266,45 @@ class JSONFormsAPI {
    */
   async getForm(formId, callback) {
     try {
-      let token = '';
-      await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
+      let token_object = {};
+      await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
         if (error) {
+          error.IAPerror.origin = 'jsonForms-getForm';
           return callback(null, error);
         }
-        token = theToken;
+        token_object = token_obj;
       });
       if (formId === null) {
-        return callback(null, 'The form ID is null');
+        const error = this.utils.formatErrorObject("jsonForms-getForm", "Null Arguments", ["formId"], null, null, null);
+        return callback(null, error);
       }
       if (formId === '') {
-        return callback(null, 'The form ID is blank');
+        const error = this.utils.formatErrorObject("jsonForms-getForm", "Empty Arguments", ["formId"], null, null, null);
+        return callback(null, error);
       }
-      const getFormURL = `${this.baseURL}/json-forms/forms/${formId}?token=${token}`;
-      const trigger = await lib_axios.get(getFormURL);
+
+      const formatted_req = this.utils.formatAxiosRequest(this.baseURL,`/json-forms/forms/${formId}`, token_object);
+      const getFormURL = formatted_req.url;
+      const trigger = await lib_axios.get(getFormURL, formatted_req.config);
       return callback(trigger.data, null);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("jsonForms-getForm", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
   }
 }
-;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/operationsManagerApi.js
+;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/operationsApi.js
+
 
 /**
  * Class that utilizes Itential's Operations Manager API to perform pipeline actions.
  */
-class OperationsManagerAPI {
+class OperationsAPI {
   constructor(baseURL, user, auth) {
     this.user = user;
     this.baseURL = baseURL;
     this.auth = auth;
+    this.utils = new Utils();
   }
 
   /**
@@ -11041,16 +11316,19 @@ class OperationsManagerAPI {
   */
   getAutomationMetrics(id, callback) {
     if (id === null) {
-      return callback(null, 'Automation ID is Null');
+      const error = this.utils.formatErrorObject("operationsManager-getAutomationMetrics", "Null Arguments", ["id"], null, null, null);
+      return callback(null, error);
     }
     this.getAutomationResult(id, (automation, fail) => {
       if (fail) {
+        fail.IAPerror.origin = 'operationsManager-getAutomationMetrics';
         return callback(null, fail);
       }
       if (automation.status === 'complete' || automation.status === 'canceled' || automation.status === 'error') {
         return callback(automation.metrics, null);
       }
-      return callback(null, `Automation is not finished! Automation State: ${automation.status}`);
+      const error = this.utils.formatErrorObject("operationsManager-getAutomationMetrics", "Unfinished Automation", [id, automation.status], null, null, null);
+      return callback(null, error);
     });
   }
 
@@ -11063,21 +11341,26 @@ class OperationsManagerAPI {
    */
   async getAutomationResult(id, callback) {
     try {
-      let token = '';
-      await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
+      let token_object = {};
+      await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
         if (error) {
+          error.IAPerror.origin = 'operationsManager-getAutomationResult';
           return callback(null, error);
         }
-        token = theToken;
+        token_object = token_obj;
       });
       if (id === null) {
-        return callback(null, 'Automation ID is Null');
+        const error = this.utils.formatErrorObject("operationsManager-getAutomationResult", "Null Arguments", ["id"], null, null, null);
+        return callback(null, error);
       }
-      const url = `${this.baseURL}/operations-manager/jobs/${id}?token=${token}`;
-      const res = await lib_axios.get(url);
+
+      const formatted_req = this.utils.formatAxiosRequest(this.baseURL,`/operations-manager/jobs/${id}`, token_object);
+      const url = formatted_req.url;
+      const res = await lib_axios.get(url, formatted_req.config);
       return callback(res.data.data, null);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("operationsManager-getAutomationResult", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
   }
 
@@ -11090,10 +11373,12 @@ class OperationsManagerAPI {
    */
   getAutomationStatus(id, callback) {
     if (id === null) {
-      return callback(null, 'Automation ID is null');
+      const error = this.utils.formatErrorObject("operationsManager-getAutomationStatus", "Null Arguments", ["id"], null, null, null);
+      return callback(null, error);
     }
     this.getAutomationResult(id, (automation, fail) => {
       if (fail) {
+        fail.IAPerror.origin = 'operationsManager-getAutomationStatus';
         return callback(null, fail);
       }
       return callback(automation.status, null);
@@ -11109,23 +11394,30 @@ class OperationsManagerAPI {
    */
   async cancelAutomations(ids, callback) {
     try {
-      let token = '';
-      await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
+      let token_object = {};
+      await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
         if (error) {
+          error.IAPerror.origin = 'operationsManager-cancelAutomations';
           return callback(null, error);
         }
-        token = theToken;
+        token_object = token_obj;
       });
-      if (ids === null || ids.length === 0) {
-        return callback(null, 'Array of ids is null or empty');
+      if (ids === null) {
+        const error = this.utils.formatErrorObject("operationsManager-cancelAutomations", "Null Arguments", ["ids"], null, null, null);
+        return callback(null, error);
+      } else if(ids.length === 0){
+        const error = this.utils.formatErrorObject("operationsManager-cancelAutomations", "Empty Arguments", ["ids"], null, null, null);
+        return callback(null, error);
       }
       if (typeof ids === 'string') {
         const tempString = ids;
         ids = [];
         ids.push(tempString);
       }
-      const url = `${this.baseURL}/operations-manager/jobs/cancel?token=${token}`;
-      const res = await lib_axios.post(url, { jobIds: ids });
+
+      const formatted_req = this.utils.formatAxiosRequest(this.baseURL,`/operations-manager/jobs/cancel`, token_object);
+      const url = formatted_req.url;
+      const res = await lib_axios.post(url, { jobIds: ids }, formatted_req.config);
       return callback(res.data.message, null);
     } catch (err) {
       if (err.response.status === 500 && err.response.data.message === 'Failed to cancel all jobs') {
@@ -11137,7 +11429,8 @@ class OperationsManagerAPI {
         }
         return callback(message, null);
       }
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("operationsManager-cancelAutomations", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
   }
 
@@ -11151,18 +11444,21 @@ class OperationsManagerAPI {
     try {
       let automations = [];
       let triggers = [];
-      let token = '';
-      await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
+      let token_object = {};
+      await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
         if (error) {
+          error.IAPerror.origin = 'operationsManager-listAutomations';
           return callback(null, error);
         }
-        token = theToken;
+        token_object = token_obj;
       });
-      const getAutomationsUrl = `${this.baseURL}/operations-manager/automations?token=${token}`;
-      const getTriggersUrl = `${this.baseURL}/operations-manager/triggers?token=${token}`;
-      const res = await lib_axios.get(getAutomationsUrl);
+      const formatted_req_auto = this.utils.formatAxiosRequest(this.baseURL,`/operations-manager/automations`, token_object);
+      const getAutomationsUrl = `${formatted_req_auto.url}&limit=1000&order=1&skip=0&sort=name`;
+      const res = await lib_axios.get(getAutomationsUrl, formatted_req_auto.config);
       automations = res.data.data;
-      const res2 = await lib_axios.get(getTriggersUrl);
+      const formatted_req_tr = this.utils.formatAxiosRequest(this.baseURL,`/operations-manager/triggers`, token_object);
+      const getTriggersUrl = `${formatted_req_tr.url}&skip=0&limit=1000`;
+      const res2 = await lib_axios.get(getTriggersUrl, formatted_req_tr.config);
       triggers = res2.data.data;
       // Make an empty map for automation id mapped the index it's found
       const automationMap = new Map();
@@ -11184,7 +11480,8 @@ class OperationsManagerAPI {
       }
       return callback(automations, null);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("operationsManager-listAutomations", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
   }
 
@@ -11198,22 +11495,26 @@ class OperationsManagerAPI {
    */
   async startAutomation(automationName, triggerName, callback, formData = {}) {
     try {
-      let token = '';
-      await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
+      let token_object = {};
+      await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
         if (error) {
+          error.IAPerror.origin = 'operationsManager-startAutomation';
           return callback(null, error);
         }
-        token = theToken;
+        token_object = token_obj;
       });
       if (automationName === null || triggerName === null) {
-        return callback(null, 'One or more inputs are null');
+        const error = this.utils.formatErrorObject("operationsManager-startAutomation", "Null Arguments", ["automationName", "triggerName"], null, null, null);
+        return callback(null, error);
       }
       if (automationName === '' || triggerName === '') {
-        return callback(null, 'One or more inputs are empty');
+        const error = this.utils.formatErrorObject("operationsManager-startAutomation", "Empty Arguments", ["automationName", "triggerName"], null, null, null);
+        return callback(null, error);
       }
       let automationsWithTriggers = [];
       await this.listAutomations((automations, error) => {
         if (error) {
+          error.IAPerror.origin = 'operationsManager-startAutomation';
           return callback(null, error);
         }
         automationsWithTriggers = automations;
@@ -11224,17 +11525,21 @@ class OperationsManagerAPI {
           for (let y = 0; y < triggers.length; y++) {
             if (triggers[y].name === triggerName) {
               const triggerId = triggers[y]._id;
-              const startautomationUrl = `${this.baseURL}/operations-manager/triggers/manual/${triggerId}/run?token=${token}`;
-              const res = await lib_axios.post(startautomationUrl, {formData});
+              const formatted_req = this.utils.formatAxiosRequest(this.baseURL,`/operations-manager/triggers/manual/${triggerId}/run`, token_object);
+              const startautomationUrl = formatted_req.url;
+              const res = await lib_axios.post(startautomationUrl, {formData}, formatted_req.config);
               return callback(res.data, null);
             }
           }
-          return callback(null, 'Can\'t find specified trigger');
+          const error = this.utils.formatErrorObject("operationsManager-startAutomation", "Can't Find Trigger", [triggerName, automationName], null, null, null);
+          return callback(null, error);
         }
       }
-      return callback(null, 'Can\'t find specified automation');
+      const error = this.utils.formatErrorObject("operationsManager-startAutomation", "Can't Find Automation", [automationName], null, null, null);
+      return callback(null, error);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("operationsManager-startAutomation", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
   }
 
@@ -11248,25 +11553,34 @@ class OperationsManagerAPI {
   async startAutomationEndpoint(apiEndpoint, apiEndpointBody = {}, callback) {
 
     try {
-      let token = '';
-      await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
+      let token_object = {};
+      await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
         if (error) {
+          error.IAPerror.origin = 'operationsManager-startAutomationEndpoint';
           return callback(null, error);
         }
-        token = theToken;
+        token_object = token_obj;
       });
+
+      if(apiEndpoint === null){
+        const error = this.utils.formatErrorObject("operationsManager-startAutomationEndpoint", "Null Arguments", ["apiEndpoint"], null, null, null);
+        return callback(null, error);
+      } else if(apiEndpoint === ''){
+        const error = this.utils.formatErrorObject("operationsManager-startAutomationEndpoint", "Empty Arguments", ["apiEndpoint"], null, null, null);
+        return callback(null, error);
+      }
 
       //handling input by user
       if (apiEndpoint.startsWith('/')){
         apiEndpoint= apiEndpoint.substring(1);
       }
-      
-      const url = `${this.baseURL}/operations-manager/triggers/endpoint/${apiEndpoint}?token=${token}`;
-      const res = await lib_axios.post(url, apiEndpointBody);
+      const formatted_req = this.utils.formatAxiosRequest(this.baseURL,`/operations-manager/triggers/endpoint/${apiEndpoint}`, token_object);
+      const url = formatted_req.url;
+      const res = await lib_axios.post(url, apiEndpointBody, formatted_req.config);
       return callback(res.data, null);
-      
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("operationsManager-startAutomationEndpoint", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
 
   }
@@ -11274,6 +11588,7 @@ class OperationsManagerAPI {
 }
 
 ;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/transformationsAPI.js
+
 
 /**
  * Class that utilizes Itential's Transformations API to perform pipeline actions.
@@ -11283,6 +11598,7 @@ class TransformationsAPI {
     this.user = user;
     this.baseURL = baseURL;
     this.auth = auth;
+    this.utils = new Utils();
   }
 
   /**
@@ -11294,25 +11610,31 @@ class TransformationsAPI {
    */
   async runTransformation(id, incoming, callback) {
     try {
-      let token = '';
-      await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
+      let token_object = {};
+      await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
         if (error) {
+          error.IAPerror.origin = 'transformations-getToken';
           return callback(null, error);
         }
-        token = theToken;
+        token_object = token_obj;
       });
       if (id === null || incoming === null) {
-        return callback(null, 'One or more method arguemnts are null');
+        const error = this.utils.formatErrorObject("transformations-runTransformation", "Null Arguments", ["id", "incoming"], null, null, null);
+        return callback(null, error);
       }
-      const transformationURL = `${this.baseURL}/transformations/${id}?token=${token}`;
-      const res = await lib_axios.post(transformationURL, incoming);
+
+      const formatted_req = this.utils.formatAxiosRequest(this.baseURL,`/transformations/${id}`, token_object);
+      const transformationURL = formatted_req.url;
+      const res = await lib_axios.post(transformationURL, incoming, formatted_req.config);
       return callback(res, null);
     } catch (err) {
-      return callback(null, err);
+      const error = this.utils.formatErrorObject("transformations-runTransformation", "Axios Error", null, null, null, err);
+      return callback(null, error);
     }
   }
 }
 ;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/healthApi.js
+
 
 /**
  * Class that utilizes Itential's API to obtain the Health status.
@@ -11323,6 +11645,7 @@ class HealthAPI {
         this.user = user;
         this.baseURL = baseURL;
         this.auth = auth;
+        this.utils = new Utils();
     }
 
    /**
@@ -11333,20 +11656,22 @@ class HealthAPI {
 
     async getServerHealth(callback){
         try {
-            let token = '';
-            await this.auth.getToken(`${this.baseURL}_${this.user}`, (theToken, error) => {
+            let token_object = {};
+            await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
                 if (error) {
+                    error.IAPerror.origin = 'health-getServerHealth';
                     return callback(null, error);
                 }
-                token = theToken;
+                token_object = token_obj;
             });
 
-            const url = `${this.baseURL}/health/server?token=${token}`;
-            const res = await lib_axios.get(url);
+            const formatted_req = this.utils.formatAxiosRequest(this.baseURL,'/health/server', token_object);
+            const url = formatted_req.url;
+            const res = await lib_axios.get(url, formatted_req.config);
             return callback(res.data, null);
-            
         } catch (err) {
-            return callback(null, err);
+            const error = this.utils.formatErrorObject("health-getServerHealth", "Axios Error", null, null, null, err);
+            return callback(null, error);
         }
        
     }
@@ -11362,63 +11687,74 @@ class HealthAPI {
 
 
 
-const ItentialSDK = { Authentication: Authentication, GenericAPI: GenericAPI, JSONFormsAPI: JSONFormsAPI, OperationsManagerAPI: OperationsManagerAPI, TransformationsAPI: TransformationsAPI, HealthAPI: HealthAPI}
+const ItentialSDK = { Authentication: Authentication, GenericAPI: GenericAPI, FormsAPI: FormsAPI, OperationsAPI: OperationsAPI, TransformationsAPI: TransformationsAPI, HealthAPI: HealthAPI}
 ;// CONCATENATED MODULE: ./src/action.js
 
 
 
 
 async function run() {
-  
-  const iap_token = (0,core.getInput)("iap_token");
+  const auth_token = (0,core.getInput)("auth_token");
+  const auth_username = (0,core.getInput)("auth_username");
+  const auth_password = (0,core.getInput)("auth_password");
+  const auth_client_id = (0,core.getInput)("auth_client_id");
+  const auth_client_secret = (0,core.getInput)("auth_client_secret");
   const api_endpoint_body = JSON.parse((0,core.getInput)("api_endpoint_body"));
   const time_interval = (0,core.getInput)("time_interval");
   const no_of_attempts = (0,core.getInput)("no_of_attempts");
   const automation_status = (0,core.getInput)("automation_status");
-  let iap_instance = (0,core.getInput)("iap_instance");
-  if (iap_instance.endsWith('/'))
-    iap_instance = iap_instance.substring(0, iap_instance.length - 1);
+  let itential_host_url = (0,core.getInput)("itential_host_url");
+  if (itential_host_url.endsWith('/'))
+    itential_host_url = itential_host_url.substring(0, itential_host_url.length - 1);
   let api_endpoint = (0,core.getInput)("api_endpoint");
   if (api_endpoint.startsWith('/'))
     api_endpoint = api_endpoint.substring(1);
-  
+
+
   let count = 0;
 
-   //using the ea-utils library
+  //using the ea-utils library
    const user = [
     {
-      hostname: iap_instance,
-      username: '',
-      password: '',
-      token: iap_token
+      hostname: itential_host_url,
+      username: auth_username,
+      password: auth_password,
+      client_id: auth_client_id,
+      client_secret: auth_client_secret,
+      token: auth_token
     }
   ]
 
   const authentication = new ItentialSDK.Authentication(user); 
-  const opsManager = new ItentialSDK.OperationsManagerAPI(authentication.users[0].hostname, authentication.users[0].userKey, authentication);
+  const opsApi = new ItentialSDK.OperationsAPI(authentication.users[0].hostname, authentication.users[0].userKey, authentication);
   const health = new ItentialSDK.HealthAPI(authentication.users[0].hostname, authentication.users[0].userKey, authentication);
-  
+  const message = "An Itential account is required to get credentials needed to configure the Github Actions." + 
+  "In order to utilize this action, you would need to have an active \`Itential Automation Platform\` (IAP)." + 
+  "If you are an existing customer, please contact your Itential account team for additional details." + 
+  "For new customers interested in an Itential trial, please click [here](https://www.itential.com/get-started/) to request one."
+
   try {
     //check the status of the automation and return the output (IAP release <= 2021.1)
     const automationStatus211 = (automation_id) => {
       lib_axios.get(
-        `${iap_instance}/workflow_engine/job/${automation_id}/details?token=` +
-        iap_token
+        `${itential_host_url}/workflow_engine/job/${automation_id}/details?token=` +
+        authentication.users[0].token
       )
         .then((res) => {
           console.log("Automation Status: ", res.data.status);
           if (res.data.status === "running" && count < no_of_attempts) {
+            console.log(" Getting Status Attempt # ", count);
             setTimeout(() => {
               count += 1;
               automationStatus211(automation_id);
             }, time_interval * 1000);
           } else if (res.data.status === "complete") {
             lib_axios.get(
-              `${iap_instance}/workflow_engine/job/${automation_id}/output?token=` +
-              iap_token
+              `${itential_host_url}/workflow_engine/job/${automation_id}/output?token=` +
+              authentication.users[0].token
             )
               .then((res) => {
-                (0,core.setOutput)("results", res.data.variables); 
+                (0,core.setOutput)("results", res.data); 
               })
               .catch((err) => {
                 (0,core.setFailed)(err.response.data);
@@ -11441,22 +11777,17 @@ async function run() {
     //check the status of the automation and return the output (IAP release > 2021.1)
     const automationStatus221 = (automation_id) => {
 
-      opsManager.getAutomationResult(automation_id, (res,err) => {
+      opsApi.getAutomationResult(automation_id, (res,err) => {
         if (err){
-          if (typeof err === "string") {
-            (0,core.setFailed)(err);
-          } else if(typeof err.response === "object") {
-            (0,core.setFailed)(err.response.data);
-          } else (0,core.setFailed)(`Failed while getting automation result: Please check the instance configuration and credentials
-          An Itential account is required to get credentials needed to configure the Github Actions.
-          In order to utilize this action, you would need to have an active \`Itential Automation Platform\` (IAP).
-          If you are an existing customer, please contact your Itential account team for additional details.
-          For new customers interested in an Itential trial, please click [here](https://www.itential.com/get-started/) to request one.`);
+          if(typeof err.IAPerror.stack === "object" && typeof err.IAPerror.stack.response === "object" ) {
+            (0,core.setFailed)("origin:" + err.IAPerror.origin + ";" + err.IAPerror.stack.response.data);
+
+          } else (0,core.setFailed)("Failed while getting automation result: " + message);
 
         } else {
           console.log("Automation Status: ", res.status);
           if (res.status === "running" && count < no_of_attempts) {
-            console.log(" Attempt # ", count);
+            console.log(" Getting Status Attempt # ", count);
             setTimeout(() => {
               count += 1;
               automationStatus221(automation_id);
@@ -11483,17 +11814,11 @@ async function run() {
       health.getServerHealth((res, err)=> {
 
         if(err){
-          if(typeof err === "string"){
-            (0,core.setFailed)(err);
 
-          } else if(typeof err.response === "object") {
-            (0,core.setFailed)(err.response.data);
+          if(typeof err.IAPerror.stack === "object" && typeof err.IAPerror.stack.response === "object" ) {
+            (0,core.setFailed)("origin:" + err.IAPerror.origin + ";" + err.IAPerror.stack.response.data);
 
-          } else (0,core.setFailed)(`Failed while checking server health: Please check the instance configuration and credentials
-            An Itential account is required to get credentials needed to configure the Github Actions.
-            In order to utilize this action, you would need to have an active \`Itential Automation Platform\` (IAP).
-            If you are an existing customer, please contact your Itential account team for additional details.
-            For new customers interested in an Itential trial, please click [here](https://www.itential.com/get-started/) to request one.`);
+          } else (0,core.setFailed)("Failed while server health check: " + message);
 
         } else {
 
@@ -11502,18 +11827,20 @@ async function run() {
             res.release.lastIndexOf(".")
           );
 
-          opsManager.startAutomationEndpoint(api_endpoint, api_endpoint_body, (res, err)=> {
+          opsApi.startAutomationEndpoint(api_endpoint, api_endpoint_body, (res, err)=> {
 
             if(err){
-              if(typeof err === "string"){
-                (0,core.setFailed)(err);
-              } else if(typeof err.response === "object") {
-                (0,core.setFailed)(err.response.data);
-              } else (0,core.setFailed)(`Failed while starting automation: Please check the instance configuration and credentials
-                An Itential account is required to get credentials needed to configure the Github Actions.
-                In order to utilize this action, you would need to have an active \`Itential Automation Platform\` (IAP).
-                If you are an existing customer, please contact your Itential account team for additional details.
-                For new customers interested in an Itential trial, please click [here](https://www.itential.com/get-started/) to request one.`);
+              
+             if(typeof err.IAPerror.stack === "object" && typeof err.IAPerror.stack.response === "object" ) {
+                if(typeof err.IAPerror.stack.response.data === "object"){
+                  (0,core.setFailed)("origin:" + err.IAPerror.origin + ";" + err.IAPerror.stack.response.data.message);
+                }
+                
+                else{
+                  (0,core.setFailed)("origin:" + err.IAPerror.origin + ";" + err.IAPerror.stack.response.data);
+                }
+                
+              } else (0,core.setFailed)("Failed while starting automation: " + message);
             }else {
               if (Boolean(Number(automation_status)) === true) {
                 if (Number(release) <= 2021.1) automationStatus211(res._id);
