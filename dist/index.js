@@ -10809,28 +10809,17 @@ class Utils {
     }
 
 
-    // getMarketingMessage(){
-    //     return <body>
-    //     <div id="root"></div>
-    //     <h1>Customer Support</h1>
-    //     <span> You would need an Itential account to get the credentials to configure the ServiceNow application.</span>
-    //     <br/>
-    //     <span>In order to utilize this application, you would need to have an active
-    //                 Itential Automation Platform (IAP). If you are an existing
-    //                 customer, please contact your Itential account team for
-    //                 additional details. &#xA0;</span> 
-    //     <br/>
-    //     <span> For new customers interested in an Itential trial please click&#xA0; </span>
-    //     <a href="https://www.itential.com/get-started/" target="_blank" rel="noopener noreferrer">here</a>
-    //     <span>&#xA0; to request one.</span>
-    //     <br/>
-    //     <span> Additional details can be found in our &#xA0;</span> <a href="https://docs.itential.com/opensource/docs/servicenow-application" target="_blank" rel="noopener noreferrer"> user guide</a>
-    //     <br/>
-    //     <span> Reach out to Itential for additional ServiceNow application support. &#xA0;</span> <a href="mailto:snow@itential.com">snow@itential.com</a>
-    //     <br/>
-    //     <a href="https://www.itential.com/" target="_blank" rel="noopener noreferrer">Itential</a>
-    // </body>
-    // }
+    getMarketingMessage(){
+        const marketing = {
+            iap: "In order to utilize this application, you would need to have an active Itential Automation Platform (IAP). If you are an existing customer, please contact your Itential account team for additional details.",
+            account: "You would need an Itential account to get the credentials to configure the ServiceNow application.",
+            doc: 'Additional details can be found in our <a href="https://docs.itential.com/opensource/docs/servicenow-application" target="_blank" rel="noopener noreferrer"> user guide</a>',
+            new: 'For new customers interested in an Itential trial please click <a href="https://www.itential.com/get-started/" target="_blank" rel="noopener noreferrer">here</a> to request one',
+            serviceDesk: 'Reach out to Itential for additional ServiceNow application support at <a href="mailto:snow@itential.com">snow@itential.com</a>', 
+            itentialHome: '<a href="https://www.itential.com/" target="_blank" rel="noopener noreferrer">Itential</a>'
+        }
+        return marketing;
+    }
 
 }
 ;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/authApi.js
@@ -11173,7 +11162,16 @@ class GenericAPI {
    */
   async genericRequest(method, hyperSchema, href, callback, data = {}) {
     try {
+      method = method.trim();
+      hyperSchema = hyperSchema.trim();
+      href = href.trim();
       let token_object = {};
+      let query = ''
+      if(href.includes("?")){
+        query = '&';
+      } else {
+        query = '?';
+      }
       await this.auth.getToken(`${this.baseURL}_${this.user}`, (token_obj, error) => {
         if (error) {
           error.IAPerror.origin = 'generic-genericRequest';
@@ -11204,6 +11202,7 @@ class GenericAPI {
               formatted_req.url,
             headers
           };
+
         } else if (method === 'GET') {
           axiosRequest = {
             method,
@@ -11211,6 +11210,10 @@ class GenericAPI {
               formatted_req.url,
             headers
           };
+  
+        }else {
+          const error = this.utils.formatErrorObject("generic-genericReqiest", "Invalid HTTP Method", null, null, null, null);
+          return callback(null, error);
         }
   
       }else {  // for basic or static token
@@ -11220,23 +11223,25 @@ class GenericAPI {
             method,
             data,
             url:
-              `${this.baseURL}${hyperSchema}${href}?token=${token_object.token}`
+              `${this.baseURL}${hyperSchema}${href}${query}token=${token_object.token_object}`
           };
+          
         } else if (method === 'GET') {
           axiosRequest = {
             method,
             url:
-              `${this.baseURL}${hyperSchema}${href}?token=${token_object.token}`
+              `${this.baseURL}${hyperSchema}${href}${query}token=${token_object.token}`
           };
+  
+        }else {
+          const error = this.utils.formatErrorObject("generic-genericReqiest", "Invalid HTTP Method", null, null, null, null);
+          return callback(null, error);
         }
-
       }
 
       const res = await lib_axios(axiosRequest);
       return callback(res, null);
-
-      const error = this.utils.formatErrorObject("generic-genericReqiest", "Invalid HTTP Method", null, null, null, null);
-      return callback(null, error);
+     
     } catch (err) {
       const error = this.utils.formatErrorObject("generic-genericReqiest", "Axios Error", null, null, null, err);
       return callback(null, error);
