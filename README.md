@@ -23,10 +23,10 @@ For new customers interested in an Itential trial, please click [here](https://w
 
 ## Supported Itential Automation Platform Versions
 
-* 2023.1
-* 2022.1
-* 2021.2
-* 2021.1
+- 2023.1
+- 2022.1
+- 2021.2
+- 2021.1
 
 ## Getting Started
 
