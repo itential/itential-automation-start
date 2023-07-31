@@ -18,7 +18,7 @@ async function run() {
   let api_endpoint = getInput("api_endpoint");
   if (api_endpoint.startsWith('/'))
     api_endpoint = api_endpoint.substring(1);
-  const auth_grant_type = "client_credentials";
+
 
   let count = 0;
 
@@ -30,7 +30,6 @@ async function run() {
       password: auth_password,
       client_id: auth_client_id,
       client_secret: auth_client_secret,
-      grant_type: auth_grant_type,
       token: auth_token
     }
   ]
