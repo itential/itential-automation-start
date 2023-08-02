@@ -53,6 +53,7 @@ async function run() {
         .then((res) => {
 
           const result = { 
+            automation_id: automation_id,
             automation_status: null,
             automation_output: null
           }
@@ -107,6 +108,7 @@ async function run() {
         } else {
 
           const result = { 
+            automation_id: automation_id,
             automation_status: null,
             automation_output: null
           }
@@ -172,13 +174,27 @@ async function run() {
                 
               } else setFailed("Failed while starting automation: " + message);
             }else {
+
+              const result = { 
+                automation_id: null,
+                automation_status: null,
+                automation_output: null
+              }
+
               if (Boolean(Number(automation_status)) === true) {
                 if (Number(release) <= 2021.1) automationStatus211(res._id);
                 else automationStatus221(res.data._id);
               }
               else {
-                if (Number(release) <= 2021.1) setOutput("results", res._id);
-                else setOutput("results", res.data._id);
+                //automation_status set to 0
+                if (Number(release) <= 2021.1){
+                  result.automation_id = res._id;
+                  setOutput("results", result);
+                } 
+                else{
+                  result.automation_id = res.data._id
+                  setOutput("results", result);
+                } 
               }
             }
           });

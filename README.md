@@ -130,6 +130,7 @@ Sample Output
 
 ```
   { 
+    "automation_id": 4569ghffhgfdhg67,
     "automation_status": "running",
     "automation_output": null
   }
