@@ -51,8 +51,13 @@ async function run() {
         authentication.users[0].token
       )
         .then((res) => {
+
+          const result = { 
+            automation_status: null,
+            automation_output: null
+          }
           console.log("Automation Status: ", res.data.status);
-          if (res.data.status === "running" && count < no_of_attempts) {
+          if ((res.data.status === "running" || res.data.status === "paused" ) && count < no_of_attempts) {
             console.log(" Getting Status Attempt # ", count);
             setTimeout(() => {
               count += 1;
@@ -65,19 +70,23 @@ async function run() {
               authentication.users[0].token
             )
               .then((res) => {
-                setOutput("results", res.data); 
+                result.automation_status = res.data.status;
+                result.automation_output = res.data;
+                setOutput("results", result);
               })
               .catch((err) => {
                 setFailed(err.response.data);
               });
           } else if (res.data.status === "canceled") {
-            setFailed("Automation Canceled");
+            result.automation_status = res.data.status;
+            setOutput("results", result);
           } else if (res.data.status === "error") {
-            setFailed(res.data.error);
+            result.automation_status = res.data.status;
+            setOutput("results", result);
           } else {
-            setFailed(
-              "Automation Timed out based upon user defined time_interval and no_of_attempts"
-            );
+            console.log('Automation Timed out based upon user defined time_interval and no_of_attempts');
+            result.automation_status = res.data.status;
+            setOutput("results", result);
           }
         })
         .catch((err) => {
@@ -96,23 +105,33 @@ async function run() {
           } else setFailed("Failed while getting automation result: " + message);
 
         } else {
+
+          const result = { 
+            automation_status: null,
+            automation_output: null
+          }
+
           console.log("Automation Status: ", res.status);
-          if (res.status === "running" && count < no_of_attempts) {
+          if ((res.status === "running" || res.status === "paused") && count < no_of_attempts) {
             console.log(" Getting Status Attempt # ", count);
             setTimeout(() => {
               count += 1;
               automationStatus221(automation_id);
             }, time_interval * 1000);
           } else if (res.status === "complete") {
-            setOutput("results", res.variables);
+            result.automation_status = res.status;
+            result.automation_output = res.variables;
+            setOutput("results", result);
           } else if (res.status === "canceled") {
-            setFailed("Automation Canceled");
+            result.automation_status = res.status;
+            setOutput("results", result);
           } else if (res.status === "error") {
-            setFailed(res.error);
+            result.automation_status = res.status;
+            setOutput("results", result);
           } else {
-            setFailed(
-              'Automation Timed out based upon user defined time_interval and no_of_attempts'
-            );
+            console.log('Automation Timed out based upon user defined time_interval and no_of_attempts');
+            result.automation_status = res.status;
+            setOutput("results", result);
           }
 
         }

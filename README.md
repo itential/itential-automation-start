@@ -33,10 +33,18 @@ For new customers interested in an Itential trial, please click [here](https://w
 1. Search for the Action on Github Marketplace.
 2. Select the "Use the Latest Version" option on the top right of the screen.
 3. Click the clipboard icon to copy the provided data.
-4. Navigate to the '.github/workflows' file in the target repository (where you intend on using the action).
-5. Paste the copied data in the correlating fields.
-6. Configure the required inputs and optional inputs. (See note)
-7. Save it as a main.yml file.
+
+    Sample 
+    ```
+    - name: itential-automation-start
+    uses: itential/itential-automation-start@0.0.1
+    ```
+4. Navigate to the '.github/workflows' folder in the target repository (where you intend on using the action).
+5. Paste the copied data in the correlating fields of your workflow file.
+6. Configure the required inputs and optional inputs. (See Note and [Configurations](#configurations))
+7. Save the file with a (.yml) extension.
+
+_For a sample workflow file, see [Example Usage](#example-usage)._
 
 > **_Note:_** Users may manually enter required input parameters or use Github Secrets if they want to hide certain parameters. If you choose to use Github Secrets, please reference the instructions provided below.
 
@@ -48,6 +56,8 @@ For new customers interested in an Itential trial, please click [here](https://w
   For SECRET enter your desired variable.
 5. Click "Add Secret"
 
+_For more information about Github Action secrets, see [Github Secrets](https://docs.github.com/en/rest/actions/secrets?apiVersion=2022-11-28)_
+
 _For more information about Github Actions variables, see [variables](https://docs.github.com/en/actions/learn-github-actions/variables)_
 
 ## Configurations
@@ -58,13 +68,15 @@ _For more information about connecting to private network, see [Connecting to a 
 
 ### Required Input Parameters
 
-The following table defines the required input parameters to run an Itential automation using a Github workflow.Input data is provided through Github Actions secrets. For more information about github action secrets, see [Github Secrets](https://docs.github.com/en/rest/actions/secrets?apiVersion=2022-11-28)
+The following table defines the required input parameters to run an Itential automation using a Github workflow.
 
-| Parameter         | Description                                      |
-| ----------------- | ------------------------------------------------ |
-| itential_host_url | URL to the Itential Instance.                    |
-| api_endpoint      | API endpoint name to start an automation.        |
-| api_endpoint_body | The POST body used to create the workflow input. |
+_For more information on Itential's API endpoint, see [here]( https://apidocs.itential.com/api/app-operations_manager/runEndpointTriggerWithPost/)._
+
+| Parameter         | Description                                                       |
+| ----------------- | ------------------------------------------------------------------|
+| itential_host_url | URL to the Itential Instance.                                     |
+| api_endpoint      | API endpoint route name to start an automation.                   |
+| api_endpoint_body | The POST body used to provide the input values for the automation |
 
 ### Required Authentication Parameters
 
@@ -108,9 +120,20 @@ The following table defines three parameters considered optional.
 
 ### Output
 
+The following table defines parameters that are returned. The output is returned as an object with two keys - automation_status and automation_output. 
+
 | Parameter | Description                       |
 | --------- | --------------------------------- |
 | results   | Automation Start output variables |
+
+Sample Output
+
+```
+  { 
+    "automation_status": "running",
+    "automation_output": null
+  }
+```
 
 ## Example Usage
 
@@ -145,7 +168,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Itential Automation Start action step
         id: step1
-        uses: itential/itential-automation-start@version_number
+        uses: itential/itential-automation-start@replace_with_latest_version
         with:
           #github_token: ${{secrets.GITHUB_TOKEN}} # include only if user requires a GitHub Token
           itential_host_url: ${{secrets.ITENTIAL_HOST_URL}}
