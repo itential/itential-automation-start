@@ -10852,10 +10852,8 @@ class Authentication {
     // if dynamic token
     // will have understand the units followed in res for expires_in and accordingly modify the logic
     const timeNow = new Date();
-    console.log('time now', timeNow);
-    console.log('time left to expire', this.users[indx].expires_in - timeNow);
     timeNow.setMinutes(timeNow.getMinutes() + 1);
-    console.log('after inc', timeNow);
+    
     if (this.users[indx].expires_in <= timeNow) {
       console.log('Token expired');
       return false;
@@ -10877,11 +10875,10 @@ class Authentication {
       const res = await lib_axios.post(url, data);
       this.users[indx].token = res.data;
       const timeNow = new Date();
-      console.log('time now', timeNow);
+      
       //setting the efault expiry duration since the responsed does not provide an appropriate expiry duration
       this.users[indx].expires_in = timeNow.setMinutes(timeNow.getMinutes() + this.default_expiry_duration);
-      console.log('expiry set to ', timeNow);
-      console.log('the new token', this.users[indx].expires_in);
+      
       return callback(this.users[indx].token);
     } catch (err) {
       const error = this.utils.formatErrorObject("authentication-getNewPasswToken", "Error when fetching or renewing a token", null, null, null, err);
@@ -10903,11 +10900,10 @@ class Authentication {
       const res = await lib_axios.post(url, data);
       this.users[indx].token = res.data; // update the token in the list
       const timeNow = new Date();
-      console.log('time now', timeNow);
+      
       //setting the efault expiry duration since the responsed does not provide an appropriate expiry duration
       this.users[indx].expires_in = timeNow.setMinutes(timeNow.getMinutes() + this.default_expiry_duration);
-      console.log('expiry set to ', timeNow);
-      console.log('the renewed token ', this.users[indx].token);
+      
       return callback(this.users[indx].token);
     } catch (err) {
       const error = this.utils.formatErrorObject("authentication-renewPasswToken", "Error when fetching or renewing a token", null, null, null, err);
@@ -10966,7 +10962,6 @@ class Authentication {
       const timeNow = new Date();
       timeNow.setSeconds(timeNow.getSeconds() + res.data.expires_in);
       this.users[indx].expires_in = timeNow;
-      console.log('expiry of renewed Token', timeNow);
       return callback(this.users[indx].token);
     } catch (err) {
       const error = this.utils.formatErrorObject("authentication-renewOAuthToken", "Error when fetching or renewing an OAuth token", null, null, null, err);
@@ -11021,10 +11016,10 @@ class Authentication {
         // oauth user, get new token
         await this.getNewOAuthToken(indx, (res, err) => {
           if (err) {
-            console.log('got error here');
+            
             return callback(null, err);
           }
-          console.log('not here');
+          
           token_object.token = res;
           return callback(token_object);
         });
@@ -11059,7 +11054,7 @@ class Authentication {
       basic: false,
       staticToken: false
     };
-    // console.log(user);
+    
     if (!Object.prototype.hasOwnProperty.call(user, 'hostname') || !user.hostname.length) {
       errorMessage = 'For authentication, manadatory property \'hostname\' is missing';
     } else {
@@ -11077,7 +11072,7 @@ class Authentication {
     }
     
     if (errorMessage.length > 0) {
-      // console.log(errorMessage);
+      
       user.errorMessage = errorMessage;
     } else {
       //a valid user will have the the authType property now
@@ -11096,10 +11091,10 @@ class Authentication {
 
       if(!Object.prototype.hasOwnProperty.call(checkUser, 'validity') || checkUser.validity === false){
         const user = this.checkValidUser(checkUser);
-        // console.log(user);
+       
         const valid = Object.prototype.hasOwnProperty.call(user, 'authType');
         user.validity = valid; 
-        // console.log(valid);
+      
         if (valid) {
           //if valid user add the additional properties as per the auth type
           if (user.hostname.endsWith('/')){
@@ -11223,7 +11218,7 @@ class GenericAPI {
             method,
             data,
             url:
-              `${this.baseURL}${hyperSchema}${href}${query}token=${token_object.token_object}`
+              `${this.baseURL}${hyperSchema}${href}${query}token=${token_object.token}`
           };
           
         } else if (method === 'GET') {
@@ -11248,6 +11243,7 @@ class GenericAPI {
     }
   }
 }
+
 ;// CONCATENATED MODULE: ./node_modules/ea-utils/lib/formsApi.js
 
 
@@ -11746,8 +11742,14 @@ async function run() {
         authentication.users[0].token
       )
         .then((res) => {
+
+          const result = { 
+            automation_id: automation_id,
+            automation_status: null,
+            automation_output: null
+          }
           console.log("Automation Status: ", res.data.status);
-          if (res.data.status === "running" && count < no_of_attempts) {
+          if ((res.data.status === "running" || res.data.status === "paused" ) && count < no_of_attempts) {
             console.log(" Getting Status Attempt # ", count);
             setTimeout(() => {
               count += 1;
@@ -11759,19 +11761,23 @@ async function run() {
               authentication.users[0].token
             )
               .then((res) => {
-                (0,core.setOutput)("results", res.data); 
+                result.automation_status = res.data.status;
+                result.automation_output = res.data;
+                (0,core.setOutput)("results", result);
               })
               .catch((err) => {
                 (0,core.setFailed)(err.response.data);
               });
           } else if (res.data.status === "canceled") {
-            (0,core.setFailed)("Automation Canceled");
+            result.automation_status = res.data.status;
+            (0,core.setOutput)("results", result);
           } else if (res.data.status === "error") {
-            (0,core.setFailed)(res.data.error);
+            result.automation_status = res.data.status;
+            (0,core.setOutput)("results", result);
           } else {
-            (0,core.setFailed)(
-              "Automation Timed out based upon user defined time_interval and no_of_attempts"
-            );
+            console.log('Automation Timed out based upon user defined time_interval and no_of_attempts');
+            result.automation_status = res.data.status;
+            (0,core.setOutput)("results", result);
           }
         })
         .catch((err) => {
@@ -11790,23 +11796,34 @@ async function run() {
           } else (0,core.setFailed)("Failed while getting automation result: " + message);
 
         } else {
+
+          const result = { 
+            automation_id: automation_id,
+            automation_status: null,
+            automation_output: null
+          }
+
           console.log("Automation Status: ", res.status);
-          if (res.status === "running" && count < no_of_attempts) {
+          if ((res.status === "running" || res.status === "paused") && count < no_of_attempts) {
             console.log(" Getting Status Attempt # ", count);
             setTimeout(() => {
               count += 1;
               automationStatus221(automation_id);
             }, time_interval * 1000);
           } else if (res.status === "complete") {
-            (0,core.setOutput)("results", res.variables);
+            result.automation_status = res.status;
+            result.automation_output = res.variables;
+            (0,core.setOutput)("results", result);
           } else if (res.status === "canceled") {
-            (0,core.setFailed)("Automation Canceled");
+            result.automation_status = res.status;
+            (0,core.setOutput)("results", result);
           } else if (res.status === "error") {
-            (0,core.setFailed)(res.error);
+            result.automation_status = res.status;
+            (0,core.setOutput)("results", result);
           } else {
-            (0,core.setFailed)(
-              'Automation Timed out based upon user defined time_interval and no_of_attempts'
-            );
+            console.log('Automation Timed out based upon user defined time_interval and no_of_attempts');
+            result.automation_status = res.status;
+            (0,core.setOutput)("results", result);
           }
 
         }
@@ -11847,13 +11864,27 @@ async function run() {
                 
               } else (0,core.setFailed)("Failed while starting automation: " + message);
             }else {
+
+              const result = { 
+                automation_id: null,
+                automation_status: null,
+                automation_output: null
+              }
+
               if (Boolean(Number(automation_status)) === true) {
                 if (Number(release) <= 2021.1) automationStatus211(res._id);
                 else automationStatus221(res.data._id);
               }
               else {
-                if (Number(release) <= 2021.1) (0,core.setOutput)("results", res._id);
-                else (0,core.setOutput)("results", res.data._id);
+                //automation_status set to 0
+                if (Number(release) <= 2021.1){
+                  result.automation_id = res._id;
+                  (0,core.setOutput)("results", result);
+                } 
+                else{
+                  result.automation_id = res.data._id
+                  ;(0,core.setOutput)("results", result);
+                } 
               }
             }
           });
